@@ -6,9 +6,7 @@ import { useForm } from "react-hook-form";
 
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle
 } from "@/components/ui/drawer";
@@ -21,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 
 import CustomerCard from "@/components/CustomerCard";
@@ -31,14 +29,47 @@ import CustomerForm from "@/components/CustomerForm";
 
 
 const CommonComponent = ({ setIsOpen, customers}) => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filteredCustomers, setFilteredCustomers] = useState(customers)
+ 
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value)
+  }
+  
+  useEffect(() => {
+    setFilteredCustomers(customers.filter((customer) => {
+      if (searchQuery.trim() === '') {
+        return customer
+      }
+      const fullName = `${customer.name} ${customer.surname}`
+
+      return (
+        customer.name.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
+        customer.surname.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
+        fullName.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
+        customer.address.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
+        customer.phone.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
+        customer.email.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) 
+      )
+    }
+    ))
+  }, [customers, searchQuery])
+
+
   return (
     <>
       <Navbar />
       <section className="">
         <div className="flex items-center justify-center max-w-[45rem] mx-auto p-3 gap-2 mb-10 flex-wrap">
-          <div className="flex items-center w-full rounded-lg gap-5">
-            <Search size={20} />
-            <Input type="search" placeholder="Search" className="w-full font-semibold" />
+          <div className="relative flex items-center w-full rounded-lg">
+            <Input
+              type="search"
+              placeholder="Search"
+              className="w-full pl-10 font-semibold"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+            <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
           <Button onClick={() => setIsOpen(true)} className='flex-1'>
             <PlusCircleIcon />
@@ -48,11 +79,11 @@ const CommonComponent = ({ setIsOpen, customers}) => {
 
       {/* clientes */}
       {
-        customers.length > 0 && (
+        filteredCustomers.length > 0 && (
           <div className="flex flex-col gap-5  max-w-[45rem] w-full mx-auto p-3">
-            {customers.map((customer, index) => (
+            {filteredCustomers.map((customer) => (
               <CustomerCard 
-                key={index}
+                key={customer.id}
                 customer={customer}
               />
             ))}
@@ -119,7 +150,6 @@ export default function HomePage() {
     form.reset()
   })
 
-  console.log(customers)
 
   return (
     <>
@@ -142,11 +172,6 @@ export default function HomePage() {
               <DrawerTitle>Introduce los datos del Cliente</DrawerTitle>
             </DrawerHeader>
             <CustomerForm handleSubmit={handleSubmit} form={form}/>
-            <DrawerFooter>
-              <DrawerClose asChild>
-                <Button variant="outline">Cerrar</Button>
-              </DrawerClose>
-            </DrawerFooter>
           </DrawerContent>
         </Drawer>
       )}

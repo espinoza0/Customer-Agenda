@@ -37,7 +37,6 @@ const AutocompleteWidget = ({field}) => {
 };
 export default function CustomerForm({handleSubmit, form}) {
     
-    // const [selectedPlace, setSelectedPlace] = useState(null)
 
     return (
         <Form {...form}>
