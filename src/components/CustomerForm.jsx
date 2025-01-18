@@ -15,7 +15,7 @@ const AutocompleteWidget = ({field}) => {
         componentRestrictions: { country: 'es' },
         fields: ['address_components', 'formatted_address', 'geometry'],
       },
-      appendTo: document.body
+    //   appendTo: document.body
     });
       
     return (
@@ -23,7 +23,7 @@ const AutocompleteWidget = ({field}) => {
             <Input 
                 ref={ref} 
                 onChange={(e) => field.onChange(e.target.value)}
-                className={"relative"}
+                // className={"relative"}
                 onKeyDown={(e) => {
                     if (e.key == "Enter") {
                         e.preventDefault()
