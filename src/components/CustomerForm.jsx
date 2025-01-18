@@ -1,19 +1,42 @@
 import { Form, FormField, FormItem, FormControl, FormMessage, FormLabel} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Autocomplete from "react-google-autocomplete";
-import { useState } from "react";
+import { usePlacesWidget } from "react-google-autocomplete";
+// import { useState } from "react";
+
+const AutocompleteWidget = ({field}) => {
+
+    const { ref } = usePlacesWidget({
+      apiKey: import.meta.env.VITE_API_KEY,
+      onPlaceSelected: (place) => {
+        field.onChange(place.formatted_address);
+        // setSelectedPlace(place.formatted_address)
+      },
+      options: {  
+        types: ['address'],
+        componentRestrictions: { country: 'es' },
+        fields: ['address_components', 'formatted_address', 'geometry'],
+      }
+    });
+  
+    return (
+      <input 
+        ref={ref} 
+        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+        onChange={(e) => field.onChange(e.target.value)}
+        // value={field.value ?? ''}
+        onKeyDown={(e) => {
+            if (e.key == "Enter") {
+                e.preventDefault()
+            }
+        }}
+        value={field.value || ''}
+      />
+    );
+};
 export default function CustomerForm({handleSubmit, form}) {
     
-    const [selectedPlace, setSelectedPlace] = useState(null)
-
-    // const handlePlaceChanged = (autocomplete) => {
-    //     if (autocomplete) {
-    //       const place = autocomplete.getPlace();
-    //       const address = place?.formatted_address || "";
-    //       form.setValue(name, address); // Actualiza el valor del formulario
-    //     }
-    // };
+    // const [selectedPlace, setSelectedPlace] = useState(null)
 
     return (
         <Form {...form}>
@@ -71,34 +94,20 @@ export default function CustomerForm({handleSubmit, form}) {
                     </FormItem>
                 )}
                 />
-               {/* <FormField
+               <FormField
                     name="address"
                     control={form.control}
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel htmlFor="address">Calle</FormLabel>
                         <FormControl>
-                            <Autocomplete
-                            apiKey={import.meta.env.VITE_API_KEY}
-                            onPlaceSelected={(place, event) => {
-                                event.preventDefault()
-                                const address = place?.formatted_address || "";
-                                field.onChange(address); // Sincroniza el valor seleccionado con el formulario
-                            }}
-                            options={{
-                                types: ["address"],
-                                componentRestrictions: { country: "es" },
-                            }}
-                            defaultValue={field.value ?? ""}
-                            className="border rounded-md w-full p-[0.5rem]"
-                            placeholder="Introduce una dirección"
-                            />
+                            <AutocompleteWidget field={field}/>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
-                /> */}
-                <FormField
+                />
+                {/* <FormField
                     name="address"
                     control={form.control}
                     render={({ field }) => (
@@ -110,9 +119,9 @@ export default function CustomerForm({handleSubmit, form}) {
                             <FormMessage />
                         </FormItem>
                 )}
-                />
+                /> */}
                 {/* /AUTOCOMPLETADO CALLE */}
-                <div>
+                {/* <div>
                     <label htmlFor="">Calle</label>
                     <Autocomplete
                         apiKey={import.meta.env.VITE_API_KEY}
@@ -127,9 +136,13 @@ export default function CustomerForm({handleSubmit, form}) {
                         }}
                         defaultValue=""
                     />
-                </div>
 
-                <Button type="submit">Añadir Cliente</Button>
+                    <input type="text" className="hidden" name="address" value={selectedPlace} />
+                </div> */}
+
+                {/* <AutocompleteWidget/> */}
+
+                <Button type="submit" className="">Añadir Cliente</Button>
             </form>
         </Form>
     )
