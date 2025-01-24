@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar1, Home, Mail, MoreHorizontal, Phone, Trash2Icon } from "lucide-react"
+import {Home, Mail, MoreHorizontal, Phone, Trash2Icon } from "lucide-react"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
+import { Button } from "./ui/button"
+import SetNoticeDrawer from "./customercard/SetNoticeDrawer"
 
 
 export default function CustomerCard({customer}) {
@@ -19,13 +20,13 @@ export default function CustomerCard({customer}) {
                 <MoreHorizontal/>
               </PopoverTrigger>
               <PopoverContent className="max-w-[5rem]">
-                <div className="flex flex-col justify-center items-center gap-5">
-                  <button>
+                <div className="flex flex-col justify-center items-center gap-3">
+                  <Button>
+                    {/* remove client */}
                     <Trash2Icon/>
-                  </button>
-                  <button>
-                    <Calendar1/>
-                  </button>
+                  </Button>
+
+                  <SetNoticeDrawer customer={customer}/>
                 </div>
               </PopoverContent>
             </Popover>
