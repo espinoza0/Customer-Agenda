@@ -98,47 +98,62 @@ const CommonComponent = ({ setIsOpen, customers}) => {
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "María",
-      surname: "García",
-      address: "Calle Principal 123, 28001 Madrid",
-      phone: "+34 612 345 678", 
-      email: "maria.garcia@email.com"
-    },
-    {
-      id: 2,
-      name: "Juan",
-      surname: "Martínez",
-      address: "Avenida de la Paz 45, 08001 Barcelona", 
-      phone: "+34 623 456 789",
-      email: "juan.martinez@email.com"
-    },
-    {
-      id: 3,
-      name: "Ana",
-      surname: "Rodríguez",
-      address: "Plaza Mayor 7, 46001 Valencia",
-      phone: "+34 634 567 890",
-      email: "ana.rodriguez@email.com"
-    },
-    {
-      id: 4,
-      name: "Carlos",
-      surname: "López",
-      address: "Calle Sierpes 22, 41001 Sevilla",
-      phone: "+34 645 678 901",
-      email: "carlos.lopez@email.com"
-    },
-    {
-      id: 5,
-      name: "Elena",
-      surname: "Sánchez",
-      address: "Gran Vía 56, 50001 Zaragoza",
-      phone: "+34 656 789 012",
-      email: "elena.sanchez@email.com"
-    }
+    // {
+    //   id: 1,
+    //   name: "María",
+    //   surname: "García",
+    //   address: "Calle Principal 123, 28001 Madrid",
+    //   phone: "+34 612 345 678", 
+    //   email: "maria.garcia@email.com"
+    // },
+    // {
+    //   id: 2,
+    //   name: "Juan",
+    //   surname: "Martínez",
+    //   address: "Avenida de la Paz 45, 08001 Barcelona", 
+    //   phone: "+34 623 456 789",
+    //   email: "juan.martinez@email.com"
+    // },
+    // {
+    //   id: 3,
+    //   name: "Ana",
+    //   surname: "Rodríguez",
+    //   address: "Plaza Mayor 7, 46001 Valencia",
+    //   phone: "+34 634 567 890",
+    //   email: "ana.rodriguez@email.com"
+    // },
+    // {
+    //   id: 4,
+    //   name: "Carlos",
+    //   surname: "López",
+    //   address: "Calle Sierpes 22, 41001 Sevilla",
+    //   phone: "+34 645 678 901",
+    //   email: "carlos.lopez@email.com"
+    // },
+    // {
+    //   id: 5,
+    //   name: "Elena",
+    //   surname: "Sánchez",
+    //   address: "Gran Vía 56, 50001 Zaragoza",
+    //   phone: "+34 656 789 012",
+    //   email: "elena.sanchez@email.com"
+    // }
   ]);
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/clients/getClients')
+      const data = await response.json()
+
+      setCustomers(data)
+      
+    } catch (error) {
+      console.error(error)
+    }
+  } 
+
+
+
   
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -149,6 +164,11 @@ export default function HomePage() {
     setIsOpen(false)
     form.reset()
   })
+
+
+  useEffect(() => {
+    fetchCustomers()
+  }, [])
 
 
   return (

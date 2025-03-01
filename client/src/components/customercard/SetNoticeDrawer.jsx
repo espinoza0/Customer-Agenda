@@ -29,6 +29,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { TimePicker } from "../time-picker/time-picker";
 import { DrawerFooter } from "../ui/drawer";
 import { useToast } from "../../hooks/use-toast";
+import { DialogFooter } from "../ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 
 export default function SetNoticeDrawer({customer}) {
   const {toast} =  useToast()
@@ -69,17 +71,65 @@ export default function SetNoticeDrawer({customer}) {
     <>
         {isDesktop ? (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                    <Button>
+                        {/* Agendar */}
+                        <Calendar1/>
+                    </Button>
+                </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                    <DialogTitle></DialogTitle>
-                    <DialogDescription></DialogDescription>
+                        <DialogTitle>Agendar Visita - {customer?.name + ' ' + customer?.surname}</DialogTitle>
+                        <DialogDescription>Selecciona fecha, hora y lugar para la visita</DialogDescription>
                     </DialogHeader>
+                    <div className="space-y-4 p-4">
+                        <div className="flex items-center flex-col">
+                            <Calendar 
+                                mode="single" 
+                                selected={fecha} 
+                                onSelect={setFecha} 
+                                locale={es} 
+                                className="rounded-md border p-3"
+                            />
+                        </div>
+                        <div className="flex justify-center">
+                            <TimePicker setDate={setFecha} date={fecha || new Date()}/>
+                        </div>
+                        <div className="grid gap-2 ">
+                            <Label htmlFor="lugar" className="text-sm font-medium">Lugar: </Label>
+                            <Select onValueChange={setLugar} defaultValue={customer?.address}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecciona un lugar" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={customer?.address}>{customer?.address}</SelectItem>
+                                    <SelectItem value={'custom'}>
+                                        Selecciona otro lugar
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+        
+                        <div className="space-y-3">
+                            <Label htmlFor="observaciones">Observaciones: </Label>
+                            <Textarea
+                                id="observaciones"
+                                placeholder="Añade cualquier observación o detalle adicional aquí"
+                                value={observaciones}
+                                onChange={(e) => setObservaciones(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={() => handleCrearAviso()}>Crear Aviso</Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         ):(
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger>
                 <Button>
+                    Agendar
                     <Calendar1/>
                 </Button>
             </DrawerTrigger>

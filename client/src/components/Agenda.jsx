@@ -1,9 +1,15 @@
 // import { useState } from "react"
-import { Search, ChevronDown, ChevronUp, MoreVertical } from "lucide-react"
+import { Search, ChevronDown, ChevronUp, MoreVertical } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 // import { Input } from "./ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,35 +17,60 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle} from "./ui/card"
+} from "./ui/dropdown-menu";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { useEffect, useState } from "react";
+import { cn } from "../lib/utils";
 
-const data = [
-  {
-    id: "728ed52f",
-    fecha: "2023-05-01",
-    cliente: "Cliente A",
-    descripcion: "Reparación de aire acondicionado",
-    estado: "Completado",
-  },
-  {
-    id: "489e1d42",
-    fecha: "2023-05-03",
-    cliente: "Cliente B",
-    descripcion: "Instalación de calefacción",
-    estado: "Pendiente",
-  },
-  {
-    id: "153e1d42",
-    fecha: "2023-05-05",
-    cliente: "Cliente C",
-    descripcion: "Mantenimiento de sistema eléctrico",
-    estado: "En progreso",
-  },
-  // Agrega más datos de ejemplo aquí
-]
+// const data = [
+//   {
+//     id: "728ed52f",
+//     fecha: "2023-05-01",
+//     cliente: "Cliente A",
+//     descripcion: "Reparación de aire acondicionado",
+//     estado: "Completado",
+//   },
+//   {
+//     id: "489e1d42",
+//     fecha: "2023-05-03",
+//     cliente: "Cliente B",
+//     descripcion: "Instalación de calefacción",
+//     estado: "Pendiente",
+//   },
+//   {
+//     id: "153e1d42",
+//     fecha: "2023-05-05",
+//     cliente: "Cliente C",
+//     descripcion: "Mantenimiento de sistema eléctrico",
+//     estado: "En progreso",
+//   },
+//   // Agrega más datos de ejemplo aquí
+// ];
 
 export default function Agenda() {
+  const [visits, setVisits] = useState([]);
+
+  const fetchVisits = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/notices/getNotices");
+      const data = await response.json();
+
+      setVisits(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVisits();
+  }, []);
+
   return (
     <div className="w-full max-w-md mx-auto p-4 space-y-4">
       <div className="space-y-2">
@@ -50,7 +81,7 @@ export default function Agenda() {
           className="w-full"
           icon={<Search className="h-4 w-4 text-gray-500" />}
         /> */}
-        <Select >
+        <Select>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filtrar por cliente" />
           </SelectTrigger>
@@ -68,11 +99,11 @@ export default function Agenda() {
       </div>
 
       <div className="space-y-4">
-        {data.map((servicio) => (
-          <Card key={servicio.id}>
+        {visits.map((visit) => (
+          <Card key={visit.id}>
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
-                <span>{servicio.cliente}</span>
+                <span>{visit.client_name}</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -82,7 +113,9 @@ export default function Agenda() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(servicio.id)}>
+                    <DropdownMenuItem
+                      onClick={() => navigator.clipboard.writeText(visit.id)}
+                    >
                       Copiar ID del servicio
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -93,20 +126,17 @@ export default function Agenda() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">{servicio.fecha}</p>
-              <p className="mt-2">{servicio.descripcion}</p>
+              <p className="text-sm text-gray-500">{visit.date}</p>
+              <p className="mt-2">{visit.observations}</p>
             </CardContent>
             <CardFooter>
               <span
-                className={`text-sm font-semibold ${
-                  servicio.estado === "Completado"
-                    ? "text-green-600"
-                    : servicio.estado === "Pendiente"
-                      ? "text-yellow-600"
-                      : "text-blue-600"
-                }`}
+                className={cn(
+                  "text-sm font-semibold",
+                  !visit.pending ? "text-green-600" : "text-yellow-600"
+                )}
               >
-                {servicio.estado}
+                {visit.pending ? "Pendiente" : "Realizada"}
               </span>
             </CardFooter>
           </Card>
@@ -115,5 +145,5 @@ export default function Agenda() {
 
       {/* {servicios.length === 0 && <p className="text-center text-gray-500">No se encontraron resultados.</p>} */}
     </div>
-  )
+  );
 }

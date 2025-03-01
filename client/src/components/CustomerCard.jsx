@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {Home, Mail, MoreHorizontal, Phone, Trash2Icon } from "lucide-react"
+import {Edit, History, Home, Mail, MoreHorizontal, Phone, Trash2Icon } from "lucide-react"
 import {
   Popover,
   PopoverContent,
@@ -20,12 +20,20 @@ export default function CustomerCard({customer}) {
                 <MoreHorizontal/>
               </PopoverTrigger>
               <PopoverContent className="max-w-[5rem]">
-                <div className="flex flex-col justify-center items-center gap-3">
+                <div className="flex flex-col justify-center items-center gap-3 w-full">
                   <Button>
-                    {/* remove client */}
+                    {/* Eliminar */}
                     <Trash2Icon/>
                   </Button>
+                  <Button>
+                    {/* Editar */}
+                    <Edit/>
+                  </Button>
 
+                  <Button>
+                    <History/>
+                  </Button>
+                  
                   <SetNoticeDrawer customer={customer}/>
                 </div>
               </PopoverContent>
