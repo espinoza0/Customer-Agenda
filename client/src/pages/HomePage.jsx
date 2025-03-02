@@ -8,7 +8,7 @@ import {
   Drawer,
   DrawerContent,
   DrawerHeader,
-  DrawerTitle
+  DrawerTitle,
 } from "@/components/ui/drawer";
 
 import {
@@ -19,42 +19,59 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 
 import CustomerCard from "@/components/CustomerCard";
 import CustomerForm from "@/components/CustomerForm";
+import { toast } from "../hooks/use-toast";
+import { AppContext } from "../context/AppContext";
 
+const CommonComponent = ({ setIsOpen, customers }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredCustomers, setFilteredCustomers] = useState(customers);
 
-
-
-const CommonComponent = ({ setIsOpen, customers}) => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filteredCustomers, setFilteredCustomers] = useState(customers)
- 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
-  }
-  
+    setSearchQuery(e.target.value);
+  };
+
   useEffect(() => {
-    setFilteredCustomers(customers.filter((customer) => {
-      if (searchQuery.trim() === '') {
-        return customer
-      }
-      const fullName = `${customer.name} ${customer.surname}`
+    setFilteredCustomers(
+      customers.filter((customer) => {
+        if (searchQuery.trim() === "") {
+          return customer;
+        }
+        const fullName = `${customer.name} ${customer.surname}`;
 
-      return (
-        customer.name.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
-        customer.surname.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
-        fullName.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
-        customer.address.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
-        customer.phone.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) ||
-        customer.email.toLowerCase().trim().includes(searchQuery.toLowerCase().trim()) 
-      )
-    }
-    ))
-  }, [customers, searchQuery])
-
+        return (
+          customer.name
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim()) ||
+          customer.surname
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim()) ||
+          fullName
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim()) ||
+          customer.address
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim()) ||
+          customer.phone
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim()) ||
+          customer.email
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim())
+        );
+      })
+    );
+  }, [customers, searchQuery]);
 
   return (
     <>
@@ -69,27 +86,25 @@ const CommonComponent = ({ setIsOpen, customers}) => {
               value={searchQuery}
               onChange={handleSearch}
             />
-            <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search
+              size={20}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
           </div>
-          <Button onClick={() => setIsOpen(true)} className='flex-1'>
+          <Button onClick={() => setIsOpen(true)} className="flex-1">
             <PlusCircleIcon />
             <p>Añadir Cliente</p>
           </Button>
         </div>
 
-      {/* clientes */}
-      {
-        filteredCustomers.length > 0 && (
+        {/* clientes */}
+        {filteredCustomers.length > 0 && (
           <div className="flex flex-col gap-5  max-w-[45rem] w-full mx-auto p-3">
             {filteredCustomers.map((customer) => (
-              <CustomerCard 
-                key={customer.id}
-                customer={customer}
-              />
+              <CustomerCard key={customer.id} customer={customer} />
             ))}
           </div>
-        )
-      }
+        )}
       </section>
     </>
   );
@@ -97,83 +112,87 @@ const CommonComponent = ({ setIsOpen, customers}) => {
 
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
-  const [customers, setCustomers] = useState([
-    // {
-    //   id: 1,
-    //   name: "María",
-    //   surname: "García",
-    //   address: "Calle Principal 123, 28001 Madrid",
-    //   phone: "+34 612 345 678", 
-    //   email: "maria.garcia@email.com"
-    // },
-    // {
-    //   id: 2,
-    //   name: "Juan",
-    //   surname: "Martínez",
-    //   address: "Avenida de la Paz 45, 08001 Barcelona", 
-    //   phone: "+34 623 456 789",
-    //   email: "juan.martinez@email.com"
-    // },
-    // {
-    //   id: 3,
-    //   name: "Ana",
-    //   surname: "Rodríguez",
-    //   address: "Plaza Mayor 7, 46001 Valencia",
-    //   phone: "+34 634 567 890",
-    //   email: "ana.rodriguez@email.com"
-    // },
-    // {
-    //   id: 4,
-    //   name: "Carlos",
-    //   surname: "López",
-    //   address: "Calle Sierpes 22, 41001 Sevilla",
-    //   phone: "+34 645 678 901",
-    //   email: "carlos.lopez@email.com"
-    // },
-    // {
-    //   id: 5,
-    //   name: "Elena",
-    //   surname: "Sánchez",
-    //   address: "Gran Vía 56, 50001 Zaragoza",
-    //   phone: "+34 656 789 012",
-    //   email: "elena.sanchez@email.com"
-    // }
-  ]);
+  // const [customers, setCustomers] = useState([
+  //   // {
+  //   //   id: 1,
+  //   //   name: "María",
+  //   //   surname: "García",
+  //   //   address: "Calle Principal 123, 28001 Madrid",
+  //   //   phone: "+34 612 345 678",
+  //   //   email: "maria.garcia@email.com"
+  //   // },
+  //   // {
+  //   //   id: 2,
+  //   //   name: "Juan",
+  //   //   surname: "Martínez",
+  //   //   address: "Avenida de la Paz 45, 08001 Barcelona",
+  //   //   phone: "+34 623 456 789",
+  //   //   email: "juan.martinez@email.com"
+  //   // },
+  //   // {
+  //   //   id: 3,
+  //   //   name: "Ana",
+  //   //   surname: "Rodríguez",
+  //   //   address: "Plaza Mayor 7, 46001 Valencia",
+  //   //   phone: "+34 634 567 890",
+  //   //   email: "ana.rodriguez@email.com"
+  //   // },
+  //   // {
+  //   //   id: 4,
+  //   //   name: "Carlos",
+  //   //   surname: "López",
+  //   //   address: "Calle Sierpes 22, 41001 Sevilla",
+  //   //   phone: "+34 645 678 901",
+  //   //   email: "carlos.lopez@email.com"
+  //   // },
+  //   // {
+  //   //   id: 5,
+  //   //   name: "Elena",
+  //   //   surname: "Sánchez",
+  //   //   address: "Gran Vía 56, 50001 Zaragoza",
+  //   //   phone: "+34 656 789 012",
+  //   //   email: "elena.sanchez@email.com"
+  //   // }
+  // ]);
 
-  const fetchCustomers = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/clients/getClients')
-      const data = await response.json()
-
-      setCustomers(data)
-      
-    } catch (error) {
-      console.error(error)
-    }
-  } 
-
-
-
-  
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const form = useForm({})
+  const { customers, fetchCustomers, addCustomer } = useContext(AppContext);
 
-  const handleSubmit = form.handleSubmit((data) => {
-    setCustomers([...customers, data])
-    setIsOpen(false)
-    form.reset()
-  })
+  const form = useForm({});
 
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      await addCustomer(data);
+      await fetchCustomers();
+
+      setIsOpen(false);
+      form.reset();
+      // retornar toast
+      return toast({
+        variant: "success",
+        title: "Éxito",
+        description: "Cliente añadido correctamente.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error al añadir cliente: ", error);
+      return toast({
+        variant: "error",
+        title: "Error",
+        description: "No se pudo añadir el cliente.",
+        duration: 3000,
+      });
+    }
+  });
 
   useEffect(() => {
-    fetchCustomers()
-  }, [])
-
+    fetchCustomers();
+  }, []);
 
   return (
     <>
-      <CommonComponent setIsOpen={setIsOpen} customers={customers}/>
+      <CommonComponent setIsOpen={setIsOpen} customers={customers} />
 
       {isDesktop ? (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -182,7 +201,7 @@ export default function HomePage() {
               <DialogTitle>Introduce los datos del Cliente</DialogTitle>
               <DialogDescription></DialogDescription>
             </DialogHeader>
-            <CustomerForm handleSubmit={handleSubmit} form={form}/>
+            <CustomerForm handleSubmit={handleSubmit} form={form} />
           </DialogContent>
         </Dialog>
       ) : (
@@ -191,10 +210,10 @@ export default function HomePage() {
             <DrawerHeader>
               <DrawerTitle>Introduce los datos del Cliente</DrawerTitle>
             </DrawerHeader>
-            <CustomerForm handleSubmit={handleSubmit} form={form}/>
+            <CustomerForm handleSubmit={handleSubmit} form={form} />
           </DrawerContent>
         </Drawer>
       )}
     </>
-  )
+  );
 }

@@ -1,15 +1,81 @@
-import { createContext, useState } from "react"
+import { createContext, useState } from "react";
 
-const AuthContext = createContext()
+const AppContext = createContext();
 
-const AuthProvider = ({children}) =>  {
-  const [hasAcces, setHasAccess] = useState(false)
+const AuthProvider = ({ children }) => {
+  const [hasAcces, setHasAccess] = useState(false);
+  const [customers, setCustomers] = useState([]);
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/clients/getClients");
+      const data = await response.json();
+
+      setCustomers(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addCustomer = async (data) => {
+    try {
+      const response = await fetch(`http://localhost:3000/clients/addClient`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // await fetchCustomers();
+      return await response.json();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const removeClient = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/clients/removeClient/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // await fetchCustomers();
+      return await response.json();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{hasAcces, setHasAccess}}>
+    <AppContext.Provider
+      value={{
+        hasAcces,
+        setHasAccess,
+        fetchCustomers,
+        addCustomer,
+        removeClient,
+        customers,
+        setCustomers,
+      }}
+    >
       {children}
-    </AuthContext.Provider>
-  )
-}
+    </AppContext.Provider>
+  );
+};
 
-export {AuthContext, AuthProvider}
+export { AppContext, AuthProvider };

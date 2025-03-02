@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {Edit, History, Home, Mail, MoreHorizontal, Phone, Trash2Icon } from "lucide-react"
+import {Edit, History, Home, Mail, MoreHorizontal, Phone } from "lucide-react"
 import {
   Popover,
   PopoverContent,
@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/popover"
 import { Button } from "./ui/button"
 import SetNoticeDrawer from "./customercard/SetNoticeDrawer"
+import AlertConfirmation from "./AlertConfirmation"
 
 
 export default function CustomerCard({customer}) {
@@ -21,10 +22,7 @@ export default function CustomerCard({customer}) {
               </PopoverTrigger>
               <PopoverContent className="max-w-[5rem]">
                 <div className="flex flex-col justify-center items-center gap-3 w-full">
-                  <Button>
-                    {/* Eliminar */}
-                    <Trash2Icon/>
-                  </Button>
+                  <AlertConfirmation client_id={customer.id}/>
                   <Button>
                     {/* Editar */}
                     <Edit/>

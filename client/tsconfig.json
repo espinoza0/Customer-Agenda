@@ -16,6 +16,6 @@
       "noEmit": true,
       "jsx": "react-jsx" // Asegúrate de que esta opción esté configurada
     },
-    "include": ["src"],
+    "include": ["src", "src/components/ui"],
     "exclude": ["node_modules"]
 }
