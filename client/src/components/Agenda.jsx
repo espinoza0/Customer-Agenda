@@ -1,5 +1,5 @@
 // import { useState } from "react"
-import { Search, ChevronDown, ChevronUp, MoreVertical } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, MoreVertical, Calendar1Icon, List } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 // import { Input } from "./ui/input"
@@ -27,34 +27,11 @@ import {
 } from "./ui/card";
 import { useEffect, useState } from "react";
 import { cn } from "../lib/utils";
-
-// const data = [
-//   {
-//     id: "728ed52f",
-//     fecha: "2023-05-01",
-//     cliente: "Cliente A",
-//     descripcion: "Reparación de aire acondicionado",
-//     estado: "Completado",
-//   },
-//   {
-//     id: "489e1d42",
-//     fecha: "2023-05-03",
-//     cliente: "Cliente B",
-//     descripcion: "Instalación de calefacción",
-//     estado: "Pendiente",
-//   },
-//   {
-//     id: "153e1d42",
-//     fecha: "2023-05-05",
-//     cliente: "Cliente C",
-//     descripcion: "Mantenimiento de sistema eléctrico",
-//     estado: "En progreso",
-//   },
-//   // Agrega más datos de ejemplo aquí
-// ];
+// import { Input } from "./ui/input";
 
 export default function Agenda() {
   const [visits, setVisits] = useState([]);
+  const [calendarSelected, setCalendarSelected] = useState(true)
 
   const fetchVisits = async () => {
     try {
@@ -72,11 +49,14 @@ export default function Agenda() {
   }, []);
 
   return (
-    <div className="w-full max-w-md mx-auto p-4 space-y-4">
+    <div className="max-w-[40rem] mx-auto">
+      <Button onClick={() => setCalendarSelected(!calendarSelected)}>
+        {calendarSelected ? <Calendar1Icon/> : <List/>}
+      </Button>
       <div className="space-y-2">
         {/* <Input
           placeholder="Buscar servicios..."
-          value={searchTerm}
+          value={''}
           onChange={(e) => handleSearch(e.target.value)}
           className="w-full"
           icon={<Search className="h-4 w-4 text-gray-500" />}
