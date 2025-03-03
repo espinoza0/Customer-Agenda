@@ -26,6 +26,8 @@ import CustomerCard from "@/components/CustomerCard";
 import CustomerForm from "@/components/CustomerForm";
 import { toast } from "../hooks/use-toast";
 import { AppContext } from "../context/AppContext";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const CommonComponent = ({ setIsOpen, customers }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -110,56 +112,49 @@ const CommonComponent = ({ setIsOpen, customers }) => {
   );
 };
 
+// schema
+const customerSchema = z.object({
+  name: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(50, "El nombre no puede exceder 50 caracteres"),
+
+  surname: z
+    .string()
+    .min(2, "Los apellidos deben tener al menos 2 caracteres")
+    .max(50, "Los apellidos no pueden exceder 50 caracteres"),
+
+  address: z
+    .string()
+    .min(5, "La dirección debe tener al menos 5 caracteres")
+    .max(100, "La dirección no puede exceder 100 caracteres"),
+
+  email: z
+    .string()
+    .email("Por favor, introduce un email válido")
+    .min(5, "El email debe tener al menos 5 caracteres")
+    .max(50, "El email no puede exceder 50 caracteres"),
+
+  phone: z
+    .string()
+    .min(9, "El número de teléfono debe tener al menos 9 dígitos")
+    .max(15, "El número de teléfono no puede exceder 15 dígitos")
+    .regex(
+      /^\+?[0-9]+$/,
+      "El número de teléfono solo debe contener dígitos y opcionalmente un signo '+' al inicio"
+    ),
+});
+
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
-  // const [customers, setCustomers] = useState([
-  //   // {
-  //   //   id: 1,
-  //   //   name: "María",
-  //   //   surname: "García",
-  //   //   address: "Calle Principal 123, 28001 Madrid",
-  //   //   phone: "+34 612 345 678",
-  //   //   email: "maria.garcia@email.com"
-  //   // },
-  //   // {
-  //   //   id: 2,
-  //   //   name: "Juan",
-  //   //   surname: "Martínez",
-  //   //   address: "Avenida de la Paz 45, 08001 Barcelona",
-  //   //   phone: "+34 623 456 789",
-  //   //   email: "juan.martinez@email.com"
-  //   // },
-  //   // {
-  //   //   id: 3,
-  //   //   name: "Ana",
-  //   //   surname: "Rodríguez",
-  //   //   address: "Plaza Mayor 7, 46001 Valencia",
-  //   //   phone: "+34 634 567 890",
-  //   //   email: "ana.rodriguez@email.com"
-  //   // },
-  //   // {
-  //   //   id: 4,
-  //   //   name: "Carlos",
-  //   //   surname: "López",
-  //   //   address: "Calle Sierpes 22, 41001 Sevilla",
-  //   //   phone: "+34 645 678 901",
-  //   //   email: "carlos.lopez@email.com"
-  //   // },
-  //   // {
-  //   //   id: 5,
-  //   //   name: "Elena",
-  //   //   surname: "Sánchez",
-  //   //   address: "Gran Vía 56, 50001 Zaragoza",
-  //   //   phone: "+34 656 789 012",
-  //   //   email: "elena.sanchez@email.com"
-  //   // }
-  // ]);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const { customers, fetchCustomers, addCustomer } = useContext(AppContext);
 
-  const form = useForm({});
+  const form = useForm({
+    resolver: zodResolver(customerSchema),
+  });
 
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
@@ -168,7 +163,7 @@ export default function HomePage() {
 
       setIsOpen(false);
       form.reset();
-      // retornar toast
+
       return toast({
         variant: "success",
         title: "Éxito",

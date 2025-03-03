@@ -1,15 +1,15 @@
 // import { useState } from "react"
-import { Search, ChevronDown, ChevronUp, MoreVertical, Calendar1Icon, List } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  MoreVertical,
+  Calendar1Icon,
+  List,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-// import { Input } from "./ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+
 import {
   Card,
   CardContent,
@@ -27,17 +28,25 @@ import {
 } from "./ui/card";
 import { useEffect, useState } from "react";
 import { cn } from "../lib/utils";
+import { ComboboxDemo } from "./combo/CustomerCombo";
+import { format } from "date-fns";
 // import { Input } from "./ui/input";
 
 export default function Agenda() {
   const [visits, setVisits] = useState([]);
-  const [calendarSelected, setCalendarSelected] = useState(true)
+  const [calendarSelected, setCalendarSelected] = useState(true);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  const fetchVisits = async () => {
+  const fetchVisits = async (client_id = null) => {
     try {
-      const response = await fetch("http://localhost:3000/notices/getNotices");
-      const data = await response.json();
+      let url = "http://localhost:3000/notices/getNotices";
 
+      if (client_id) {
+        url += `?client_id=${client_id}`;
+      }
+
+      const response = await fetch(url);
+      const data = await response.json();
       setVisits(data);
     } catch (error) {
       console.error(error);
@@ -48,12 +57,17 @@ export default function Agenda() {
     fetchVisits();
   }, []);
 
+  useEffect(() => {
+    // si se selecciona un cliente, filtrar por el id de este
+    fetchVisits(selectedCustomer);
+  }, [selectedCustomer]);
+
   return (
     <div className="max-w-[40rem] mx-auto">
-      <Button onClick={() => setCalendarSelected(!calendarSelected)}>
-        {calendarSelected ? <Calendar1Icon/> : <List/>}
-      </Button>
-      <div className="space-y-2">
+      <div className="flex items-center gap-3 my-4">
+        <Button onClick={() => setCalendarSelected(!calendarSelected)}>
+          {calendarSelected ? <Calendar1Icon /> : <List />}
+        </Button>
         {/* <Input
           placeholder="Buscar servicios..."
           value={''}
@@ -61,17 +75,12 @@ export default function Agenda() {
           className="w-full"
           icon={<Search className="h-4 w-4 text-gray-500" />}
         /> */}
-        <Select>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Filtrar por cliente" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los clientes</SelectItem>
-            <SelectItem value="Cliente A">Cliente A</SelectItem>
-            <SelectItem value="Cliente B">Cliente B</SelectItem>
-            <SelectItem value="Cliente C">Cliente C</SelectItem>
-          </SelectContent>
-        </Select>
+
+        <ComboboxDemo
+          selectedCustomer={selectedCustomer}
+          setSelectedCustomer={setSelectedCustomer}
+        />
+
         {/* <Button variant="outline" className="w-full flex justify-between items-center" onClick={toggleSortOrder}>
           Ordenar por fecha
           {sortOrder === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -106,7 +115,9 @@ export default function Agenda() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">{visit.date}</p>
+              <p className="text-sm text-gray-500">
+                {format(visit?.date, "dd/MM/yyyy")}
+              </p>
               <p className="mt-2">{visit.observations}</p>
             </CardContent>
             <CardFooter>

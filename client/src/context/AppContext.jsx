@@ -31,7 +31,6 @@ const AuthProvider = ({ children }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // await fetchCustomers();
       return await response.json();
     } catch (error) {
       console.log(error);
@@ -54,7 +53,6 @@ const AuthProvider = ({ children }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // await fetchCustomers();
       return await response.json();
     } catch (error) {
       console.log(error);

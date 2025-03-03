@@ -36,7 +36,6 @@ const AutocompleteWidget = ({field}) => {
     );
 };
 export default function CustomerForm({handleSubmit, form}) {
-    
 
     return (
         <Form {...form}>
