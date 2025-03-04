@@ -1,11 +1,12 @@
 // import { useState } from "react"
 import {
   Search,
-  ChevronDown,
-  ChevronUp,
+  // ChevronDown,
+  // ChevronUp,
   MoreVertical,
   Calendar1Icon,
   List,
+  FilterX,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,17 @@ import { useEffect, useState } from "react";
 import { cn } from "../lib/utils";
 import { ComboboxDemo } from "./combo/CustomerCombo";
 import { format } from "date-fns";
+import { Label } from "./ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Input } from "./ui/input";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { TabsContent } from "@radix-ui/react-tabs";
 // import { Input } from "./ui/input";
 
 export default function Agenda() {
@@ -37,13 +49,39 @@ export default function Agenda() {
   const [calendarSelected, setCalendarSelected] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  const fetchVisits = async (client_id = null) => {
+  // Filtros
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedState, setSelectedState] = useState(null);
+
+  const fetchVisits = async (client_id = null, pending = null) => {
     try {
       let url = "http://localhost:3000/notices/getNotices";
 
+      let filtersParams = [];
       if (client_id) {
-        url += `?client_id=${client_id}`;
+        filtersParams.push(`client_id=${client_id}`);
       }
+
+      if (pending) {
+        let pendingType;
+
+        switch (selectedState) {
+          case "pendiente":
+            pendingType = 1;
+            break;
+          case "realizado":
+            pendingType = 0;
+            break;
+        }
+
+        filtersParams.push(`pending=${pendingType}`);
+      }
+
+      if (filtersParams.length > 0) {
+        url += `?${filtersParams.join("&")}`;
+      }
+
+      console.log(url);
 
       const response = await fetch(url);
       const data = await response.json();
@@ -59,82 +97,152 @@ export default function Agenda() {
 
   useEffect(() => {
     // si se selecciona un cliente, filtrar por el id de este
-    fetchVisits(selectedCustomer);
-  }, [selectedCustomer]);
+    fetchVisits(selectedCustomer, selectedState);
+  }, [selectedCustomer, selectedState]);
 
   return (
-    <div className="max-w-[40rem] mx-auto">
-      <div className="flex items-center gap-3 my-4">
-        <Button onClick={() => setCalendarSelected(!calendarSelected)}>
-          {calendarSelected ? <Calendar1Icon /> : <List />}
-        </Button>
-        {/* <Input
-          placeholder="Buscar servicios..."
-          value={''}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="w-full"
-          icon={<Search className="h-4 w-4 text-gray-500" />}
-        /> */}
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="space-y-2 flex flex-col">
+              <Label htmlFor="search">Buscar</Label>
+              <div className="relative flex-grow">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="search"
+                  type="search"
+                  placeholder="Buscar en citas..."
+                  className="pl-8 h-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <ComboboxDemo
-          selectedCustomer={selectedCustomer}
-          setSelectedCustomer={setSelectedCustomer}
-        />
+            <div className="space-y-2 flex flex-col">
+              <Label htmlFor="customer-filter">Cliente</Label>
+              <ComboboxDemo
+                selectedCustomer={selectedCustomer}
+                setSelectedCustomer={setSelectedCustomer}
+              />
+            </div>
 
-        {/* <Button variant="outline" className="w-full flex justify-between items-center" onClick={toggleSortOrder}>
-          Ordenar por fecha
-          {sortOrder === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </Button> */}
-      </div>
+            <div className="space-y-2 flex flex-col">
+              <Label htmlFor="estado-filter">Estado</Label>
+              <Select value={selectedState} onValueChange={setSelectedState}>
+                <SelectTrigger id="estado-filter" className="h-full">
+                  <SelectValue placeholder="Seleccionar estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Todos los estados</SelectItem>
+                  <SelectItem value="pendiente">Pendiente</SelectItem>
+                  <SelectItem value="realizado">Realizado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-      <div className="space-y-4">
-        {visits.map((visit) => (
-          <Card key={visit.id}>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <span>{visit.client_name}</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Abrir menú</span>
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                    <DropdownMenuItem
-                      onClick={() => navigator.clipboard.writeText(visit.id)}
-                    >
-                      Copiar ID del servicio
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-                    <DropdownMenuItem>Editar servicio</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">
-                {format(visit?.date, "dd/MM/yyyy")}
-              </p>
-              <p className="mt-2">{visit.observations}</p>
-            </CardContent>
-            <CardFooter>
-              <span
-                className={cn(
-                  "text-sm font-semibold",
-                  !visit.pending ? "text-green-600" : "text-yellow-600"
-                )}
+            <div className="space-y-2 flex flex-col">
+              <Label className="invisible">Acciones</Label>
+              <div className="flex space-x-2 h-full">
+                <Button
+                  onClick={() => setSelectedCustomer(null)}
+                  className="flex-grow h-full"
+                >
+                  Limpiar Filtros
+                  <FilterX className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={() => setCalendarSelected(!calendarSelected)}
+                  className="flex-shrink-0 h-full"
+                >
+                  {calendarSelected ? (
+                    <Calendar1Icon className="h-4 w-4" />
+                  ) : (
+                    <List className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+
+      <div className="mx-auto py-5">
+        <Tabs defaultValue="week" className="w-full my-2">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="week">Semana</TabsTrigger>
+            <TabsTrigger value="month">Mes</TabsTrigger>
+          </TabsList>
+          <TabsContent value="week">
+            {/* Aqui se muestran las visitas de la semana, ya ordenadas */}
+          </TabsContent>
+          {/* <TabsContent value="month">Aqui se muestran las visitas del mes, ya ordenadas</TabsContent> */}
+        </Tabs>
+        {visits.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {visits.map((visit) => (
+              <Card
+                key={visit.id}
+                className="hover:shadow-lg transition-shadow"
               >
-                {visit.pending ? "Pendiente" : "Realizada"}
-              </span>
-            </CardFooter>
-          </Card>
-        ))}
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>{visit.client_name}</span>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Abrir menú</span>
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            navigator.clipboard.writeText(visit.id)
+                          }
+                        >
+                          Copiar ID del servicio
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Ver detalles</DropdownMenuItem>
+                        <DropdownMenuItem>Editar servicio</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500">
+                    {format(visit?.date, "dd/MM/yyyy")}
+                  </p>
+                  <p className="mt-2">{visit.observations}</p>
+                </CardContent>
+                <CardFooter>
+                  <span
+                    className={cn(
+                      "text-sm font-semibold rounded-full shadow-md px-3 py-1",
+                      !visit.pending
+                        ? "bg-green-600 text-white"
+                        : "bg-yellow-600 text-white"
+                    )}
+                  >
+                    {visit.pending ? "Pendiente" : "Realizada"}
+                  </span>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center">
+            No hay servicios agendados para este cliente.
+          </p>
+        )}
       </div>
-
-      {/* {servicios.length === 0 && <p className="text-center text-gray-500">No se encontraron resultados.</p>} */}
-    </div>
+    </>
   );
 }

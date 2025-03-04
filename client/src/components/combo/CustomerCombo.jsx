@@ -16,68 +16,66 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { AppContext } from "../../context/AppContext";
 
-
-export function ComboboxDemo({selectedCustomer, setSelectedCustomer}) {
+export function ComboboxDemo({ selectedCustomer, setSelectedCustomer }) {
   const [open, setOpen] = React.useState(false);
-//   const [value, setValue] = React.useState("");
   const { customers, fetchCustomers } = React.useContext(AppContext);
 
   React.useEffect(() => {
     fetchCustomers();
   }, []);
 
-
-//   React.useEffect(() => {
-//     console.log(value)
-//   }, [value])
-
   return (
-    <div className="w-full">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            {selectedCustomer
-              ? customers.find((customer) => customer.id === selectedCustomer)?.name + " " + 
-                customers.find((customer) => customer.id === selectedCustomer)?.surname 
-              : "Selecciona Cliente..."}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command>
-            <CommandInput placeholder="Buscar Cliente..." className="h-9" />
-            <CommandList>
-              <CommandEmpty>No se encontró al cliente.</CommandEmpty>
-              <CommandGroup>
-                {customers?.map((customer) => (
-                  <CommandItem
-                    key={customer.id}
-                    value={customer.id}
-                    onSelect={(currentValue) => {
-                      setSelectedCustomer(currentValue === selectedCustomer ? "" : customer.id);
-                      setOpen(false);
-                    }}
-                    className={"cursor-pointer"}
-                  >
-                    {customer?.name + ' ' + customer?.surname}
-                    <Check
-                      className={cn(
-                        "ml-auto",
-                        selectedCustomer === customer.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {selectedCustomer
+            ? customers.find((customer) => customer.id === selectedCustomer)
+                ?.name +
+              " " +
+              customers.find((customer) => customer.id === selectedCustomer)
+                ?.surname
+            : "Selecciona Cliente..."}
+          <ChevronsUpDown className="opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder="Buscar Cliente..." className="h-9" />
+          <CommandList>
+            <CommandEmpty>No se encontró al cliente.</CommandEmpty>
+            <CommandGroup>
+              {customers?.map((customer) => (
+                <CommandItem
+                  key={customer.id}
+                  value={customer.id}
+                  onSelect={(currentValue) => {
+                    setSelectedCustomer(
+                      currentValue === selectedCustomer ? "" : customer.id
+                    );
+                    setOpen(false);
+                  }}
+                  className={"cursor-pointer"}
+                >
+                  {customer?.name + " " + customer?.surname}
+                  <Check
+                    className={cn(
+                      "ml-auto",
+                      selectedCustomer === customer.id
+                        ? "opacity-100"
+                        : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
