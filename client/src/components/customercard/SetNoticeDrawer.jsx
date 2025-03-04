@@ -58,6 +58,7 @@ export default function SetNoticeDrawer({customer}) {
     setObservaciones('')
     setIsOpen(false)
 
+    console.log(fecha)
     return toast({
         variant: "success",
         title: "Éxito",
@@ -126,60 +127,57 @@ export default function SetNoticeDrawer({customer}) {
                 </DialogContent>
             </Dialog>
         ):(
-        <Drawer open={isOpen} onOpenChange={setIsOpen}>
-            <DrawerTrigger>
-                <Button>
-                    Agendar
-                    <Calendar1/>
-                </Button>
+            <Drawer open={isOpen} onOpenChange={setIsOpen}>
+            <DrawerTrigger asChild>
+              <Button>
+                <Calendar1/>
+              </Button>
             </DrawerTrigger>
-            <DrawerContent>
-                <DrawerHeader>
+            <DrawerContent className="h-[85vh] flex flex-col">
+              <DrawerHeader className="flex-shrink-0">
                 <DrawerTitle>Agendar Visita - {customer?.name + ' ' + customer?.surname}</DrawerTitle>
-                </DrawerHeader>
-                <div className="space-y-4 p-4">
-                    <div className="flex items-center flex-col">
-                        <Calendar 
-                            mode="single" 
-                            selected={fecha} 
-                            onSelect={setFecha} 
-                            locale={es} 
-                            className="rounded-md border p-3"
-                        />
-                    </div>
-                    <div className="flex justify-center">
-                        <TimePicker setDate={setFecha} date={fecha || new Date()}/>
-                    </div>
-                    <div className="grid gap-2 ">
-                        <Label htmlFor="lugar" className="text-sm font-medium">Lugar: </Label>
-                        <Select onValueChange={setLugar} defaultValue={customer?.address}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Selecciona un lugar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={customer?.address}>{customer?.address}</SelectItem>
-                                <SelectItem value={'custom'}>
-                                    Selecciona otro lugar
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-    
-                    <div className="space-y-3">
-                        <Label htmlFor="observaciones">Observaciones: </Label>
-                        <Textarea
-                            id="observaciones"
-                            placeholder="Añade cualquier observación o detalle adicional aquí"
-                            value={observaciones}
-                            onChange={(e) => setObservaciones(e.target.value)}
-                        />
-                    </div>
+              </DrawerHeader>
+              <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                <div className="flex items-center justify-center">
+                  <Calendar 
+                    mode="single" 
+                    selected={fecha} 
+                    onSelect={setFecha} 
+                    locale={es} 
+                    className="rounded-md border p-3 w-full max-w-[300px]"
+                  />
                 </div>
-                <DrawerFooter className={"border"}>
-                    <Button onClick={() => handleCrearAviso()}>Crear Aviso</Button>
-                </DrawerFooter>
+                <div className="flex justify-center">
+                  <TimePicker setDate={setFecha} date={fecha || new Date()}/>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="lugar" className="text-sm font-medium">Lugar: </Label>
+                  <Select onValueChange={setLugar} defaultValue={customer?.address}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un lugar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={customer?.address}>{customer?.address}</SelectItem>
+                      <SelectItem value={'custom'}>Selecciona otro lugar</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="observaciones">Observaciones: </Label>
+                  <Textarea
+                    id="observaciones"
+                    placeholder="Añade cualquier observación o detalle adicional aquí"
+                    value={observaciones}
+                    onChange={(e) => setObservaciones(e.target.value)}
+                  />
+                </div>
+              </div>
+              <DrawerFooter className="flex-shrink-0 border-t">
+                <Button onClick={() => handleCrearAviso()} className="w-full">Crear Aviso</Button>
+              </DrawerFooter>
             </DrawerContent>
-        </Drawer>
+          </Drawer>
+          
         )   
     }
     </>

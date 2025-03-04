@@ -171,12 +171,12 @@ export default function Agenda() {
         </CardContent>
       </Card>
 
-
       <div className="mx-auto py-5">
         <Tabs defaultValue="week" className="w-full my-2">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="week">Semana</TabsTrigger>
             <TabsTrigger value="month">Mes</TabsTrigger>
+            <TabsTrigger value="all">Todo</TabsTrigger>
           </TabsList>
           <TabsContent value="week">
             {/* Aqui se muestran las visitas de la semana, ya ordenadas */}
@@ -188,7 +188,10 @@ export default function Agenda() {
             {visits.map((visit) => (
               <Card
                 key={visit.id}
-                className="hover:shadow-lg transition-shadow"
+                className={cn(
+                  "hover:shadow-lg transition-shadow",
+                  !visit.pending && !selectedState && "opacity-50"
+                )}
               >
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">
