@@ -5,7 +5,6 @@ exports.getClients = async (req, res) => {
     const db = getDb();
     const [result] = await db.query("SELECT * FROM clients");
 
-    console.log(result);
     res.json(result);
   } catch (error) {
     console.error("Error al obtener datos:", error);
@@ -59,7 +58,7 @@ exports.removeClient = async (req, res) => {
 
     await db.commit();
 
-    if (result.affectedRows > 0) {
+    if (result[0].affectedRows > 0) {
       res.status(200).json({ message: "Cliente y todos sus datos eliminados exitosamente" });
     } else {
       res.status(404).json({ error: "Cliente no encontrado" });

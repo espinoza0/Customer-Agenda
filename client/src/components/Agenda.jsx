@@ -81,7 +81,7 @@ export default function Agenda() {
         url += `?${filtersParams.join("&")}`;
       }
 
-      console.log(url);
+      // console.log(url);
 
       const response = await fetch(url);
       const data = await response.json();
@@ -221,7 +221,7 @@ export default function Agenda() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-500">
-                    {format(visit?.date, "dd/MM/yyyy")}
+                    {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
                   </p>
                   <p className="mt-2">{visit.observations}</p>
                 </CardContent>
