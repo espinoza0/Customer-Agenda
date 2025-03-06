@@ -7,6 +7,8 @@ import {
   Calendar1Icon,
   List,
   FilterX,
+  ChevronLeftSquareIcon,
+  ChevronRightSquare,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +55,17 @@ export default function Agenda() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedState, setSelectedState] = useState(null);
 
-  const fetchVisits = async (client_id = null, pending = null) => {
+  const [currentDate, setCurrentDate] = useState({
+    startDate: '',
+    endDate: ''
+  })
+
+  /*  
+    en el fetch visits, pasalre tambien startDate y endDate, como parametro para filtrar por una fecha dependiendo de 
+    si el tab esta en week, month o ALL. Si esta en all, entonces excluir filtro por date
+  */
+
+  const fetchVisits = async (client_id = null, pending = null, rangeDate = null) => {
     try {
       let url = "http://localhost:3000/notices/getNotices";
 
@@ -77,6 +89,11 @@ export default function Agenda() {
         filtersParams.push(`pending=${pendingType}`);
       }
 
+      if (rangeDate) {
+        console.log("")
+      }
+
+
       if (filtersParams.length > 0) {
         url += `?${filtersParams.join("&")}`;
       }
@@ -98,7 +115,7 @@ export default function Agenda() {
   useEffect(() => {
     // si se selecciona un cliente, filtrar por el id de este
     fetchVisits(selectedCustomer, selectedState);
-  }, [selectedCustomer, selectedState]);
+  }, [selectedCustomer, selectedState, currentDate]);
 
   return (
     <>
@@ -172,16 +189,24 @@ export default function Agenda() {
       </Card>
 
       <div className="mx-auto py-5">
-        <Tabs defaultValue="week" className="w-full my-2">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="week">Semana</TabsTrigger>
-            <TabsTrigger value="month">Mes</TabsTrigger>
-            <TabsTrigger value="all">Todo</TabsTrigger>
-          </TabsList>
-          <TabsContent value="week">
-            {/* Aqui se muestran las visitas de la semana, ya ordenadas */}
-          </TabsContent>
+        <Tabs defaultValue="week" className="w-full my-2 flex items-center justify-between">
+          <Button>
+            <ChevronLeftSquareIcon />
+          </Button>
+          <div className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="week">Semana</TabsTrigger>
+              <TabsTrigger value="month">Mes</TabsTrigger>
+              <TabsTrigger value="all">Todo</TabsTrigger>
+            </TabsList>
+            <TabsContent value="week">
+              {/* Aqui se muestran las visitas de la semana, ya ordenadas */}
+            </TabsContent>
+          </div>
           {/* <TabsContent value="month">Aqui se muestran las visitas del mes, ya ordenadas</TabsContent> */}
+          <Button>
+            <ChevronRightSquare />
+          </Button>
         </Tabs>
         {visits.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

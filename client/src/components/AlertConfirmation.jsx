@@ -56,7 +56,7 @@ export default function AlertConfirmation({ client_id }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleRemoveClient}>
+          <AlertDialogAction onClick={handleRemoveClient} className="!bg-red-600 hover:opacity-80 transition-opacity">
             Continuar
           </AlertDialogAction>
         </AlertDialogFooter>

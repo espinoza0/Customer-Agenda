@@ -19,7 +19,7 @@ exports.getNotices = async (req, res) => {
       filters.length > 0 ? `WHERE ${filters.join(" AND ")}` : "";
 
     const [result] = await db.query(
-      `SELECT visits.*, CONCAT(clients.name, ' ', clients.surname) AS client_name FROM visits JOIN clients ON visits.client_id = clients.id ${optParams}`
+      `SELECT visits.*, CONCAT(clients.name, ' ', clients.surname) AS client_name FROM visits JOIN clients ON visits.client_id = clients.id ${optParams} ORDER BY visits.date DESC`
     );
 
     // console.log("visitas: ", result);
