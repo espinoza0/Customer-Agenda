@@ -82,6 +82,8 @@ const AuthProvider = ({ children }) => {
     }
   }
 
+  const [visits, setVisits] = useState([]);
+
   return (
     <AppContext.Provider
       value={{
@@ -92,7 +94,9 @@ const AuthProvider = ({ children }) => {
         removeClient,
         customers,
         setCustomers,
-        addVisit
+        addVisit,
+        visits, 
+        setVisits
       }}
     >
       {children}

@@ -29,7 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState } from "react";
 import { cn } from "../lib/utils";
 import { ComboboxDemo } from "./combo/CustomerCombo";
 import { format } from "date-fns";
@@ -44,13 +44,13 @@ import {
 import { Input } from "./ui/input";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
-// import { Input } from "./ui/input";
+import { AppContext } from "../context/AppContext";
 
 export default function Agenda() {
-  const [visits, setVisits] = useState([]);
+  // const [visits, setVisits] = useState([]);
+  const {visits, setVisits} = useContext(AppContext)
   const [calendarSelected, setCalendarSelected] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-
   // Filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedState, setSelectedState] = useState(null);
@@ -98,7 +98,6 @@ export default function Agenda() {
         url += `?${filtersParams.join("&")}`;
       }
 
-      // console.log(url);
 
       const response = await fetch(url);
       const data = await response.json();
