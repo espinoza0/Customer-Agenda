@@ -9,28 +9,12 @@ import { Button } from "./ui/button";
 import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 import AlertConfirmation from "./AlertConfirmation";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AppContext } from "../context/AppContext";
 
 export default function CustomerCard({ customer }) {
   const navigate = useNavigate();
-  const {setVisits} = useContext(AppContext)
-
-  // const fetchCustomerVisits = async (id) => {
-  //   try {
-  //     navigate("/agenda");
-  //     const response = await fetch(`http://localhost:3000/notices/getNotices?client_id=${id}`);
-  //     const data = await response.json();
-
-  //     setVisits(data)
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   const goToCustomerHistory = (id) => {
     navigate("/agenda");
-    // fetchCustomerVisits(id)
   };
 
   return (

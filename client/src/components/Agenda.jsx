@@ -29,10 +29,10 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import {useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { cn } from "../lib/utils";
 import { ComboboxDemo } from "./combo/CustomerCombo";
-import { format } from "date-fns";
+import { endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths, addMonths, addWeeks, subWeeks } from "date-fns";
 import { Label } from "./ui/label";
 import {
   Select,
@@ -42,79 +42,122 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Input } from "./ui/input";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
-import { TabsContent } from "@radix-ui/react-tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TabsContent } from "@/components/ui/tabs"
 import { AppContext } from "../context/AppContext";
 
 export default function Agenda() {
   // const [visits, setVisits] = useState([]);
-  const {visits, setVisits} = useContext(AppContext)
+  const { visits, setVisits } = useContext(AppContext);
   const [calendarSelected, setCalendarSelected] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   // Filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedState, setSelectedState] = useState(null);
 
-  const [currentDate, setCurrentDate] = useState({
-    startDate: '',
-    endDate: ''
-  })
+  const [activeTab, setActiveTab] = useState("week");
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null
+  });
 
-  /*  
-    en el fetch visits, pasalre tambien startDate y endDate, como parametro para filtrar por una fecha dependiendo de 
-    si el tab esta en week, month o ALL. Si esta en all, entonces excluir filtro por date
-  */
+  const [currentDate, setCurrentDate] = useState(new Date()); // Estado para la fecha actual
 
-  const fetchVisits = async (client_id = null, pending = null, rangeDate = null) => {
+  const navigatePeriod = (direction) => {
+    let newDate = new Date(currentDate);
+
+    if (activeTab === "week") {
+      newDate = direction === "next" ? addWeeks(newDate, 1) : subWeeks(newDate, 1);
+    } else if (activeTab === "month") {
+      newDate = direction === "next" ? addMonths(newDate, 1) : subMonths(newDate, 1);
+    }
+    setCurrentDate(newDate);
+  };
+
+  useEffect(() => {
+    let startDate;
+    let endDate;
+
+    if (activeTab === "week") {
+      startDate = startOfWeek(currentDate, { weekStartsOn: 1 });
+      endDate = endOfWeek(currentDate, { weekStartsOn: 1 });
+    } else if (activeTab === "month") {
+      startDate = startOfMonth(currentDate);
+      endDate = endOfMonth(currentDate);
+    } else {
+      startDate = null;
+      endDate = null;
+    }
+
+    setDateRange({ startDate, endDate });
+  }, [activeTab, currentDate]);
+
+  const fetchVisits = async (
+    client_id = null,
+    pending = null,
+    startDate = null,
+    endDate = null
+  ) => {
     try {
-      let url = "http://localhost:3000/notices/getNotices";
-
+      let url = "http://192.168.1.128:3000/notices/getNotices";
       let filtersParams = [];
+
       if (client_id) {
         filtersParams.push(`client_id=${client_id}`);
       }
 
-      if (pending) {
+      if (pending !== null) {
         let pendingType;
 
-        switch (selectedState) {
+        switch (pending) {
           case "pendiente":
             pendingType = 1;
             break;
           case "realizado":
             pendingType = 0;
             break;
+          default:
+            pendingType = null;
+            break;
         }
 
-        filtersParams.push(`pending=${pendingType}`);
+        if (pendingType !== null) {
+          filtersParams.push(`pending=${pendingType}`);
+        }
       }
 
-      if (rangeDate) {
-        console.log("")
+      if (startDate && endDate) {
+        const formattedStartDate = format(startDate, 'yyyyMMdd');
+        const formattedEndDate = format(endDate, 'yyyyMMdd');
+        filtersParams.push(`start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
       }
-
 
       if (filtersParams.length > 0) {
         url += `?${filtersParams.join("&")}`;
       }
 
+      console.log(url)
 
       const response = await fetch(url);
       const data = await response.json();
       setVisits(data);
+
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchVisits();
-  }, []);
+    let pendingValue = null;
+    if (selectedState === "pendiente") {
+      pendingValue = "pendiente";
+    } else if (selectedState === "realizado") {
+      pendingValue = "realizado";
+    }
 
-  useEffect(() => {
-    // si se selecciona un cliente, filtrar por el id de este
-    fetchVisits(selectedCustomer, selectedState);
-  }, [selectedCustomer, selectedState, currentDate]);
+    fetchVisits(selectedCustomer, pendingValue, dateRange.startDate, dateRange.endDate);
+  }, [selectedCustomer, selectedState, dateRange]);
+
 
   return (
     <>
@@ -188,8 +231,12 @@ export default function Agenda() {
       </Card>
 
       <div className="mx-auto py-5">
-        <Tabs defaultValue="week" className="w-full my-2 flex items-center justify-between">
-          <Button>
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full my-2 flex items-center justify-between"
+        >
+          <Button onClick={() => navigatePeriod("prev")}>
             <ChevronLeftSquareIcon />
           </Button>
           <div className="w-full">
@@ -198,12 +245,8 @@ export default function Agenda() {
               <TabsTrigger value="month">Mes</TabsTrigger>
               <TabsTrigger value="all">Todo</TabsTrigger>
             </TabsList>
-            <TabsContent value="week">
-              {/* Aqui se muestran las visitas de la semana, ya ordenadas */}
-            </TabsContent>
           </div>
-          {/* <TabsContent value="month">Aqui se muestran las visitas del mes, ya ordenadas</TabsContent> */}
-          <Button>
+          <Button onClick={() => navigatePeriod("next")}>
             <ChevronRightSquare />
           </Button>
         </Tabs>
@@ -265,8 +308,8 @@ export default function Agenda() {
             ))}
           </div>
         ) : (
-          <p className="text-center">
-            No hay servicios agendados para este cliente.
+          <p className="text-center py-4 font-semibold">
+            No hay servicios agendados.
           </p>
         )}
       </div>

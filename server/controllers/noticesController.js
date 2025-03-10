@@ -3,7 +3,7 @@ const { getDb } = require("../config/database");
 exports.getNotices = async (req, res) => {
   try {
     const db = getDb();
-    const { client_id, pending } = req.query;
+    const { client_id, pending, start_date, end_date} = req.query;
 
     let filters = [];
 
@@ -13,6 +13,10 @@ exports.getNotices = async (req, res) => {
 
     if (pending) {
       filters.push(`pending = ${pending}`);
+    }
+
+    if (start_date && end_date) {
+      filters.push(`date BETWEEN '${start_date}' AND DATE_ADD('${end_date}', INTERVAL 1 DAY)`)
     }
 
     const optParams =

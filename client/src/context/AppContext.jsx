@@ -8,7 +8,7 @@ const AuthProvider = ({ children }) => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch("http://localhost:3000/clients/getClients");
+      const response = await fetch("http://192.168.1.128:3000/clients/getClients");
       const data = await response.json();
 
       setCustomers(data);
@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
 
   const addCustomer = async (data) => {
     try {
-      const response = await fetch(`http://localhost:3000/clients/addClient`, {
+      const response = await fetch(`http://192.168.1.128:3000/clients/addClient`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ const AuthProvider = ({ children }) => {
   const removeClient = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/clients/removeClient/${id}`,
+        `http://192.168.1.128:3000/clients/removeClient/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -62,7 +62,7 @@ const AuthProvider = ({ children }) => {
   // Notices
   const addVisit = async (data) => {
     try {
-      const response = await fetch(`http://localhost:3000/notices/addNotice`, {
+      const response = await fetch(`http://192.168.1.128:3000/notices/addNotice`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
