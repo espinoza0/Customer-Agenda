@@ -32,7 +32,18 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { cn } from "../lib/utils";
 import { ComboboxDemo } from "./combo/CustomerCombo";
-import { endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths, addMonths, addWeeks, subWeeks } from "date-fns";
+import {
+  endOfMonth,
+  endOfWeek,
+  format,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+  addMonths,
+  addWeeks,
+  subWeeks,
+  isWithinInterval,
+} from "date-fns";
 import { Label } from "./ui/label";
 import {
   Select,
@@ -42,9 +53,10 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Input } from "./ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TabsContent } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import { AppContext } from "../context/AppContext";
+import { es } from "date-fns/locale";
 
 export default function Agenda() {
   // const [visits, setVisits] = useState([]);
@@ -58,18 +70,25 @@ export default function Agenda() {
   const [activeTab, setActiveTab] = useState("week");
   const [dateRange, setDateRange] = useState({
     startDate: null,
-    endDate: null
+    endDate: null,
   });
 
   const [currentDate, setCurrentDate] = useState(new Date()); // Estado para la fecha actual
+
+  const [periodoActual, setPeriodoActual] = useState({
+    periodoTipo: null,
+    fecha: null,
+  });
 
   const navigatePeriod = (direction) => {
     let newDate = new Date(currentDate);
 
     if (activeTab === "week") {
-      newDate = direction === "next" ? addWeeks(newDate, 1) : subWeeks(newDate, 1);
+      newDate =
+        direction === "next" ? addWeeks(newDate, 1) : subWeeks(newDate, 1);
     } else if (activeTab === "month") {
-      newDate = direction === "next" ? addMonths(newDate, 1) : subMonths(newDate, 1);
+      newDate =
+        direction === "next" ? addMonths(newDate, 1) : subMonths(newDate, 1);
     }
     setCurrentDate(newDate);
   };
@@ -81,12 +100,43 @@ export default function Agenda() {
     if (activeTab === "week") {
       startDate = startOfWeek(currentDate, { weekStartsOn: 1 });
       endDate = endOfWeek(currentDate, { weekStartsOn: 1 });
+
+      const hoy = new Date();
+      const rango = {
+        start: startDate,
+        end: endDate,
+      };
+      if (isWithinInterval(hoy, rango)) {
+        setPeriodoActual({
+          periodoTipo: "Esta semana",
+          fecha: null,
+        });
+      } else {
+        const formattedStart = format(startDate, "dd MMM  yyyy", { locale: es });
+        const formattedEnd = format(endDate, "dd MMM yyyy", { locale: es });
+
+        setPeriodoActual({
+          periodoTipo: "Semana",
+          fecha: `${formattedStart} - ${formattedEnd}`,
+        });
+      }
     } else if (activeTab === "month") {
       startDate = startOfMonth(currentDate);
       endDate = endOfMonth(currentDate);
+
+      const nombreMes = format(startDate, "MMMM", { locale: es });
+      setPeriodoActual({
+        periodoTipo: nombreMes,
+        fecha: format(startDate, 'yyyy'),
+      });
     } else {
       startDate = null;
       endDate = null;
+
+      setPeriodoActual({
+        periodoTipo: null,
+        fecha: null
+      })
     }
 
     setDateRange({ startDate, endDate });
@@ -127,21 +177,23 @@ export default function Agenda() {
       }
 
       if (startDate && endDate) {
-        const formattedStartDate = format(startDate, 'yyyyMMdd');
-        const formattedEndDate = format(endDate, 'yyyyMMdd');
-        filtersParams.push(`start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
+        const formattedStartDate = format(startDate, "yyyyMMdd");
+        const formattedEndDate = format(endDate, "yyyyMMdd");
+
+        filtersParams.push(
+          `start_date=${formattedStartDate}&end_date=${formattedEndDate}`
+        );
       }
 
       if (filtersParams.length > 0) {
         url += `?${filtersParams.join("&")}`;
       }
 
-      console.log(url)
+      console.log(url);
 
       const response = await fetch(url);
       const data = await response.json();
       setVisits(data);
-
     } catch (error) {
       console.error(error);
     }
@@ -155,9 +207,13 @@ export default function Agenda() {
       pendingValue = "realizado";
     }
 
-    fetchVisits(selectedCustomer, pendingValue, dateRange.startDate, dateRange.endDate);
+    fetchVisits(
+      selectedCustomer,
+      pendingValue,
+      dateRange.startDate,
+      dateRange.endDate
+    );
   }, [selectedCustomer, selectedState, dateRange]);
-
 
   return (
     <>
@@ -231,10 +287,16 @@ export default function Agenda() {
       </Card>
 
       <div className="mx-auto py-5">
+        <div className="my-3 text-center">
+          <h1 className="font-semibold text-2xl capitalize">
+            {periodoActual.periodoTipo || ""}
+          </h1>
+          <span>{periodoActual.fecha || ""}</span>
+        </div>
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="w-full my-2 flex items-center justify-between"
+          className="w-full my-2 flex items-center justify-between border"
         >
           <Button onClick={() => navigatePeriod("prev")}>
             <ChevronLeftSquareIcon />

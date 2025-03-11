@@ -16,7 +16,8 @@ exports.getNotices = async (req, res) => {
     }
 
     if (start_date && end_date) {
-      filters.push(`date BETWEEN '${start_date}' AND DATE_ADD('${end_date}', INTERVAL 1 DAY)`)
+      // filters.push(`date BETWEEN '${start_date}' AND DATE_ADD('${end_date}', INTERVAL 1 DAY)`)
+      filters.push(`date BETWEEN '${start_date}' AND '${end_date}'`)
     }
 
     const optParams =
