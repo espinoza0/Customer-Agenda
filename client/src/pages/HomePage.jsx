@@ -191,7 +191,23 @@ export default function HomePage() {
 
       {isDesktop ? (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={(e) => {
+              const hasPacItem = e.composedPath().some((el) => {
+                if ("classList" in el) {
+                  return Array.from(el.classList).includes("pac-item");
+                }
+                return false;
+              });
+
+              // if we click an autocomplete item, prevent the default onInteractOutside action, to close
+              if (hasPacItem) {
+                e.preventDefault();
+              }
+            }}
+          >
             <DialogHeader>
               <DialogTitle>Introduce los datos del Cliente</DialogTitle>
               <DialogDescription></DialogDescription>

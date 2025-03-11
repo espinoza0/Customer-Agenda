@@ -23,7 +23,7 @@ exports.addClient = async (req, res) => {
 
     const result = await db.query(query, values);
 
-    if (result.affectedRows > 0) {
+    if (result[0].affectedRows > 0) {
       res.status(201).json({
         message: "Cliente añadido exitosamente",
       });
