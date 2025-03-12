@@ -3,7 +3,14 @@ const { getDb } = require("../config/database");
 exports.getClients = async (req, res) => {
   try {
     const db = getDb();
-    const [result] = await db.query("SELECT * FROM clients");
+    const {client_id} = req.query
+    
+    let query = "SELECT * FROM clients "
+
+    if (client_id) {
+      query += `WHERE id = ${client_id}`
+    }
+    const [result] = await db.query(query);
 
     res.json(result);
   } catch (error) {

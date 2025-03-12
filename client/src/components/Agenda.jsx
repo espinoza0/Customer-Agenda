@@ -9,6 +9,7 @@ import {
   FilterX,
   ChevronLeftSquareIcon,
   ChevronRightSquare,
+  UserCircle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -54,13 +55,13 @@ import {
 } from "./ui/select";
 import { Input } from "./ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TabsContent } from "@/components/ui/tabs";
+// import { TabsContent } from "@/components/ui/tabs";
 import { AppContext } from "../context/AppContext";
 import { es } from "date-fns/locale";
 
 export default function Agenda() {
   // const [visits, setVisits] = useState([]);
-  const { visits, setVisits } = useContext(AppContext);
+  const { visits, fetchVisits } = useContext(AppContext);
   const [calendarSelected, setCalendarSelected] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   // Filtros
@@ -112,7 +113,9 @@ export default function Agenda() {
           fecha: null,
         });
       } else {
-        const formattedStart = format(startDate, "dd MMM  yyyy", { locale: es });
+        const formattedStart = format(startDate, "dd MMM  yyyy", {
+          locale: es,
+        });
         const formattedEnd = format(endDate, "dd MMM yyyy", { locale: es });
 
         setPeriodoActual({
@@ -127,7 +130,7 @@ export default function Agenda() {
       const nombreMes = format(startDate, "MMMM", { locale: es });
       setPeriodoActual({
         periodoTipo: nombreMes,
-        fecha: format(startDate, 'yyyy'),
+        fecha: format(startDate, "yyyy"),
       });
     } else {
       startDate = null;
@@ -135,69 +138,69 @@ export default function Agenda() {
 
       setPeriodoActual({
         periodoTipo: null,
-        fecha: null
-      })
+        fecha: null,
+      });
     }
 
     setDateRange({ startDate, endDate });
   }, [activeTab, currentDate]);
 
-  const fetchVisits = async (
-    client_id = null,
-    pending = null,
-    startDate = null,
-    endDate = null
-  ) => {
-    try {
-      let url = "http://192.168.1.128:3000/notices/getNotices";
-      let filtersParams = [];
+  // const fetchVisits = async (
+  //   client_id = null,
+  //   pending = null,
+  //   startDate = null,
+  //   endDate = null
+  // ) => {
+  //   try {
+  //     let url = "http://192.168.1.128:3000/notices/getNotices";
+  //     let filtersParams = [];
 
-      if (client_id) {
-        filtersParams.push(`client_id=${client_id}`);
-      }
+  //     if (client_id) {
+  //       filtersParams.push(`client_id=${client_id}`);
+  //     }
 
-      if (pending !== null) {
-        let pendingType;
+  //     if (pending !== null) {
+  //       let pendingType;
 
-        switch (pending) {
-          case "pendiente":
-            pendingType = 1;
-            break;
-          case "realizado":
-            pendingType = 0;
-            break;
-          default:
-            pendingType = null;
-            break;
-        }
+  //       switch (pending) {
+  //         case "pendiente":
+  //           pendingType = 1;
+  //           break;
+  //         case "realizado":
+  //           pendingType = 0;
+  //           break;
+  //         default:
+  //           pendingType = null;
+  //           break;
+  //       }
 
-        if (pendingType !== null) {
-          filtersParams.push(`pending=${pendingType}`);
-        }
-      }
+  //       if (pendingType !== null) {
+  //         filtersParams.push(`pending=${pendingType}`);
+  //       }
+  //     }
 
-      if (startDate && endDate) {
-        const formattedStartDate = format(startDate, "yyyyMMdd");
-        const formattedEndDate = format(endDate, "yyyyMMdd");
+  //     if (startDate && endDate) {
+  //       const formattedStartDate = format(startDate, "yyyyMMdd");
+  //       const formattedEndDate = format(endDate, "yyyyMMdd");
 
-        filtersParams.push(
-          `start_date=${formattedStartDate}&end_date=${formattedEndDate}`
-        );
-      }
+  //       filtersParams.push(
+  //         `start_date=${formattedStartDate}&end_date=${formattedEndDate}`
+  //       );
+  //     }
 
-      if (filtersParams.length > 0) {
-        url += `?${filtersParams.join("&")}`;
-      }
+  //     if (filtersParams.length > 0) {
+  //       url += `?${filtersParams.join("&")}`;
+  //     }
 
-      console.log(url);
+  //     console.log(url);
 
-      const response = await fetch(url);
-      const data = await response.json();
-      setVisits(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+  //     setVisits(data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   useEffect(() => {
     let pendingValue = null;
@@ -324,7 +327,10 @@ export default function Agenda() {
               >
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">
-                    <span>{visit.client_name}</span>
+                    <div className="flex gap-3 items-center">
+                      <UserCircle />
+                      <span>{visit.client_name}</span>
+                    </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

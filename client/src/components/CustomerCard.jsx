@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit, History, Home, Mail, MoreHorizontal, Phone } from "lucide-react";
+import { Edit, History, Home, Mail, MoreHorizontal, Phone, UserCircle } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -14,14 +14,15 @@ export default function CustomerCard({ customer }) {
   const navigate = useNavigate();
 
   const goToCustomerHistory = (id) => {
-    navigate("/agenda");
+    navigate(`/history/${id}`);
   };
 
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl font-bold w-fit">
+          <CardTitle className="text-2xl font-bold w-fit flex items-center gap-3">
+            <UserCircle/>
             {customer?.name + " " + customer?.surname}
           </CardTitle>
           <Popover>
