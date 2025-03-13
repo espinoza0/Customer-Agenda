@@ -1,37 +1,23 @@
-// import { useState } from "react"
 import {
   Search,
   // ChevronDown,
   // ChevronUp,
-  MoreVertical,
   Calendar1Icon,
   List,
   FilterX,
   ChevronLeftSquareIcon,
   ChevronRightSquare,
-  UserCircle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-
-import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "./ui/card";
 import { useContext, useEffect, useState } from "react";
-import { cn } from "../lib/utils";
 import { ComboboxDemo } from "./combo/CustomerCombo";
 import {
   endOfMonth,
@@ -58,6 +44,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { TabsContent } from "@/components/ui/tabs";
 import { AppContext } from "../context/AppContext";
 import { es } from "date-fns/locale";
+import NoticeCard from "./NoticeCard";
 
 export default function Agenda() {
   // const [visits, setVisits] = useState([]);
@@ -144,63 +131,6 @@ export default function Agenda() {
 
     setDateRange({ startDate, endDate });
   }, [activeTab, currentDate]);
-
-  // const fetchVisits = async (
-  //   client_id = null,
-  //   pending = null,
-  //   startDate = null,
-  //   endDate = null
-  // ) => {
-  //   try {
-  //     let url = "http://192.168.1.128:3000/notices/getNotices";
-  //     let filtersParams = [];
-
-  //     if (client_id) {
-  //       filtersParams.push(`client_id=${client_id}`);
-  //     }
-
-  //     if (pending !== null) {
-  //       let pendingType;
-
-  //       switch (pending) {
-  //         case "pendiente":
-  //           pendingType = 1;
-  //           break;
-  //         case "realizado":
-  //           pendingType = 0;
-  //           break;
-  //         default:
-  //           pendingType = null;
-  //           break;
-  //       }
-
-  //       if (pendingType !== null) {
-  //         filtersParams.push(`pending=${pendingType}`);
-  //       }
-  //     }
-
-  //     if (startDate && endDate) {
-  //       const formattedStartDate = format(startDate, "yyyyMMdd");
-  //       const formattedEndDate = format(endDate, "yyyyMMdd");
-
-  //       filtersParams.push(
-  //         `start_date=${formattedStartDate}&end_date=${formattedEndDate}`
-  //       );
-  //     }
-
-  //     if (filtersParams.length > 0) {
-  //       url += `?${filtersParams.join("&")}`;
-  //     }
-
-  //     console.log(url);
-
-  //     const response = await fetch(url);
-  //     const data = await response.json();
-  //     setVisits(data);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   useEffect(() => {
     let pendingValue = null;
@@ -318,61 +248,11 @@ export default function Agenda() {
         {visits.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {visits.map((visit) => (
-              <Card
+              <NoticeCard
                 key={visit.id}
-                className={cn(
-                  "hover:shadow-lg transition-shadow",
-                  !visit.pending && !selectedState && "opacity-50"
-                )}
-              >
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                    <div className="flex gap-3 items-center">
-                      <UserCircle />
-                      <span>{visit.client_name}</span>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Abrir menú</span>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            navigator.clipboard.writeText(visit.id)
-                          }
-                        >
-                          Copiar ID del servicio
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-                        <DropdownMenuItem>Editar servicio</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-500">
-                    {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
-                  </p>
-                  <p className="mt-2">{visit.observations}</p>
-                </CardContent>
-                <CardFooter>
-                  <span
-                    className={cn(
-                      "text-sm font-semibold rounded-full shadow-md px-3 py-1",
-                      !visit.pending
-                        ? "bg-green-600 text-white"
-                        : "bg-yellow-600 text-white"
-                    )}
-                  >
-                    {visit.pending ? "Pendiente" : "Realizada"}
-                  </span>
-                </CardFooter>
-              </Card>
+                visit={visit}
+                selectedState={selectedState}
+              />
             ))}
           </div>
         ) : (
