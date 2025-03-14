@@ -12,7 +12,6 @@ exports.getClients = async (req, res) => {
     }
     const [result] = await db.query(query);
 
-    console.log(query)
 
     res.json(result);
   } catch (error) {

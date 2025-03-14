@@ -45,3 +45,18 @@
   background-color: red;
   z-index: 1000 !important;
 } */
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  background-color: rgba(0,0,0,0.5);
+  padding: 30px 20px;
+  border-radius: 5px;
+  /* font-size: 1rem !important; */
+  max-width: 1rem !important;
+}
+.swiper-pagination-bullet {
+  background-color: white !important;
+}
+.swiper-pagination-bullet-active {
+  background-color: white !important;
+}
