@@ -5,12 +5,14 @@ exports.getClients = async (req, res) => {
     const db = getDb();
     const {client_id} = req.query
     
-    let query = "SELECT * FROM clients "
-
+   let query = "SELECT  c.*,(SELECT COUNT(*) FROM visits WHERE client_id = c.id) AS visit_count FROM clients c ";
+  
     if (client_id) {
-      query += `WHERE id = ${client_id}`
+      query += `WHERE c.id = ${client_id}`
     }
     const [result] = await db.query(query);
+
+    console.log(query)
 
     res.json(result);
   } catch (error) {

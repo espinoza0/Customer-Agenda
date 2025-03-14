@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
@@ -33,7 +33,7 @@ import { Input } from "../components/ui/input";
 
 export default function CustomerHistoryPage() {
   const { id } = useParams();
-  
+
   const {
     customers: customer,
     visits,
@@ -49,6 +49,7 @@ export default function CustomerHistoryPage() {
       try {
         await fetchCustomers(id);
         await fetchVisits(id);
+
       } catch (error) {
         console.error("Error cargando datos: ", error);
       }
@@ -66,12 +67,12 @@ export default function CustomerHistoryPage() {
     email: customer[0]?.email,
     telefono: customer[0]?.phone,
     direccion: customer[0]?.address,
-    totalServicios: visits?.length,
+    totalServicios: customer[0]?.visit_count,
     ultimoServicio:
-      visits?.length == 0
+      customer[0]?.length == 0 || !customer[0]?.lastVisit
         ? "-"
         : format({
-            date: visits[0]?.date,
+            date: customer[0]?.lastVisit,
             format: "short",
             tz: "Europe/Madrid",
           }),
