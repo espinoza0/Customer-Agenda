@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
@@ -15,19 +15,14 @@ import {
   History,
   Mail,
   MapPin,
-  // MoreVertical,
   Phone,
   Search,
-  // Search,
   User,
   UserCircle,
 } from "lucide-react";
 
-// import { Label } from "../components/ui/label";
-// import { Input } from "../components/ui/input";
 import Navbar from "../components/Navbar";
 import { format } from "@formkit/tempo";
-// import {format as datefnsFormat}  from "date-fns"
 import NoticeCard from "../components/NoticeCard";
 import { Input } from "../components/ui/input";
 

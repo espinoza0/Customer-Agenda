@@ -67,6 +67,37 @@ const AuthProvider = ({ children }) => {
       console.log(error);
     }
   };
+    // {
+    //   "name": "asdfasd",
+    //   "surname": "fasdfasdf",
+    //   "address": "Av. Holanda, 11149 Roche, Cádiz, España",
+    //   "email": "asdfasdfasf@gmail.com",
+    //   "phone": "1234719234"
+    // }
+
+  const editClient = async (id, data) => {
+    try {
+      const response = await fetch(
+        `http://192.168.1.128:3000/clients/editClient/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
 
   // Notices
   const addVisit = async (data) => {
@@ -166,6 +197,7 @@ const AuthProvider = ({ children }) => {
         visits,
         setVisits,
         fetchVisits,
+        editClient
       }}
     >
       {children}
