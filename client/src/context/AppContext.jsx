@@ -67,13 +67,6 @@ const AuthProvider = ({ children }) => {
       console.log(error);
     }
   };
-    // {
-    //   "name": "asdfasd",
-    //   "surname": "fasdfasdf",
-    //   "address": "Av. Holanda, 11149 Roche, Cádiz, España",
-    //   "email": "asdfasdfasf@gmail.com",
-    //   "phone": "1234719234"
-    // }
 
   const editClient = async (id, data) => {
     try {
@@ -84,7 +77,7 @@ const AuthProvider = ({ children }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
         }
       );
 
@@ -96,8 +89,7 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
     }
-  }
-  
+  };
 
   // Notices
   const addVisit = async (data) => {
@@ -181,6 +173,29 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const editVisit = async (data) => {
+    try {
+      const response = await fetch(
+        `http://192.168.1.128:3000/notices/editNotice`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [visits, setVisits] = useState([]);
 
   return (
@@ -197,7 +212,8 @@ const AuthProvider = ({ children }) => {
         visits,
         setVisits,
         fetchVisits,
-        editClient
+        editClient,
+        editVisit
       }}
     >
       {children}

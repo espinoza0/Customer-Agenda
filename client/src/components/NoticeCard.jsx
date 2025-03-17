@@ -18,7 +18,7 @@ import {
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,11 +36,12 @@ import "swiper/css/pagination";
 
 
 import '../App.css';
+import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 
 
 export default function NoticeCard({ visit, selectedState }) {
   const fileInputRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
 
   const handleCameraClick = () => {
     fileInputRef.current.click();
@@ -82,7 +83,7 @@ export default function NoticeCard({ visit, selectedState }) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-                <DropdownMenuItem>Editar servicio</DropdownMenuItem>
+          
               </DropdownMenuContent>
             </DropdownMenu>
           </CardTitle>
@@ -140,6 +141,8 @@ export default function NoticeCard({ visit, selectedState }) {
                 </Swiper>
               </DialogContent>
             </Dialog>
+             
+            <SetNoticeDrawer visit={visit}/>
 
             <input
               type="file"
