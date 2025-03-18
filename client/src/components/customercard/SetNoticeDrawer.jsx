@@ -24,7 +24,7 @@ import { Textarea } from "../ui/textarea";
 import { useMediaQuery } from "@uidotdev/usehooks";
 
 import { TimePicker } from "../time-picker/time-picker";
-import { useToast } from "../../hooks/use-toast";
+import { toast } from "../../hooks/use-toast";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { AppContext } from "../../context/AppContext";
 import { format } from "date-fns";
@@ -52,7 +52,6 @@ const formSchema = z.object({
 });
 
 export default function SetNoticeDrawer({ customer, visit = null }) {
-  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const { addVisit, editVisit, fetchVisits } = useContext(AppContext);
@@ -75,43 +74,47 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
         observations: data?.observations,
         address: data?.address,
         client_id: customer?.id,
-        visit_id:  visit?.id,
+        visit_id: visit?.id,
       };
 
       let success;
-
+      
+      
       if (visit) {
         // Editar
-        console.log(formattedData)
-        success = await editVisit(formattedData)
+        console.log(formattedData);
+        window.location.reload()  
+        success = await editVisit(formattedData);
+        
       } else {
         // Crear Aviso
         success = await addVisit(formattedData);
       }
 
-      if (!success) {
+      // console.log(success);
+
+
+      if (success) {
+        form.reset();
         return toast({
-          variant: "destructive",
-          title: "Advertencia",
-          description: `No se pudo ${
-            visit ? "editar" : "crear"
-          } el aviso para este cliente.`,
+          variant: "success",
+          title: "Éxito",
+          description: `Aviso ${visit ? "editado" : "creado"} correctamente`,
           duration: 3000,
         });
       }
 
-    
-      toast({
-        variant: "success",
-        title: "Éxito",
-        description: `Aviso ${visit ? "editado" : "creado"} correctamente`,
+      return toast({
+        variant: "destructive",
+        title: "Advertencia",
+        description: `No se pudo ${
+          visit ? "editar" : "crear"
+        } el aviso para este cliente.`,
         duration: 3000,
       });
-
-      setIsOpen(false);
     } catch (error) {
       console.error("Error al crear/editar aviso:", error);
-      toast({
+      return toast({
         variant: "destructive",
         title: "Error",
         description: "Ocurrió un error inesperado. Inténtalo de nuevo.",
@@ -128,7 +131,7 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
         observations: visit.observations || "",
       });
     }
-  }, [visit, customer, form.reset]);
+  }, [visit]);
 
   return (
     <>
@@ -230,7 +233,11 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
                   )}
                 />
 
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  onClick={() => setIsOpen(false)}
+                >
                   {visit ? "Actualizar Visita" : "Crear Visita"}
                 </Button>
               </form>

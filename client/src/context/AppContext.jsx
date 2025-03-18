@@ -187,12 +187,14 @@ const AuthProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        return false
+        // throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      return true
     } catch (error) {
       console.log(error);
+      return false
     }
   };
 
