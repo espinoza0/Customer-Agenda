@@ -104,7 +104,7 @@ export default function CustomerCard({ customer }) {
             </PopoverTrigger>
             <PopoverContent className="max-w-[5rem]">
               <div className="flex flex-col justify-center items-center gap-3 w-full">
-                <AlertConfirmation client_id={customer.id} />
+                <AlertConfirmation client_id={customer.id} type={"client"}/>
                 <Button onClick={() => setIsOpen(true)}>
                   <Edit />
                 </Button>

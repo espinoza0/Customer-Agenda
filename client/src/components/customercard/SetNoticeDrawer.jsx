@@ -83,7 +83,6 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
       if (visit) {
         // Editar
         console.log(formattedData);
-        window.location.reload()  
         success = await editVisit(formattedData);
         
       } else {
@@ -91,11 +90,11 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
         success = await addVisit(formattedData);
       }
 
-      // console.log(success);
-
-
       if (success) {
         form.reset();
+        setIsOpen(false)
+
+        await fetchVisits(visit?.client_id || customer?.id)
         return toast({
           variant: "success",
           title: "Éxito",
@@ -236,7 +235,6 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
                 <Button
                   type="submit"
                   className="w-full"
-                  onClick={() => setIsOpen(false)}
                 >
                   {visit ? "Actualizar Visita" : "Crear Visita"}
                 </Button>

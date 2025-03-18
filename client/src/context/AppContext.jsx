@@ -59,12 +59,15 @@ const AuthProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        return false
+        // throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      return true
+      // return await response.json();
     } catch (error) {
       console.log(error);
+      return false
     }
   };
 
@@ -188,7 +191,29 @@ const AuthProvider = ({ children }) => {
 
       if (!response.ok) {
         return false
-        // throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return true
+    } catch (error) {
+      console.log(error);
+      return false
+    }
+  };
+
+  const removeVisit = async (id) => {
+    try {
+      const response = await fetch(
+        `http://192.168.1.128:3000/notices/removeNotice/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        return false
       }
 
       return true
@@ -215,7 +240,8 @@ const AuthProvider = ({ children }) => {
         setVisits,
         fetchVisits,
         editClient,
-        editVisit
+        editVisit,
+        removeVisit
       }}
     >
       {children}

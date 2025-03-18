@@ -74,8 +74,29 @@ exports.editNotice = async (req, res) => {
     if (result[0].affectedRows === 0) {
       return res.status(404).json({ error: "Visita no encontrada" });
     }
+
+    return res.status(200).json({message: "Visita modificada correctamente"})
   } catch (error) {
     console.error("Error al editar la visita", error);
     res.status(400).json({ error: "Error al editar la visita" });
   }
 };
+
+exports.removeNotice = async (req, res) => {
+  const db = getDb();
+  const { id } = req.params;
+  const parsedId = parseInt(id);
+
+  try {
+    const result = await db.query("DELETE FROM visits WHERE id = ?", [parsedId]);
+
+    if (result[0].affectedRows > 0) {
+      res.status(200).json({ message: "Visita eliminada exitosamente" });
+    } else {
+      res.status(404).json({ error: "Visita no encontrada" });
+    }
+  } catch (error) {
+    console.error("Error al eliminar la visita: ", error);
+    res.status(500).json({ error: "Error al eliminar la visita." });
+  }
+}
