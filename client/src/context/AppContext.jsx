@@ -3,13 +3,15 @@ import { createContext, useState } from "react";
 
 const AppContext = createContext();
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
 const AuthProvider = ({ children }) => {
   const [hasAcces, setHasAccess] = useState(false);
   const [customers, setCustomers] = useState([]);
 
   const fetchCustomers = async (client_id = null) => {
     try {
-      let url = "http://192.168.1.128:3000/clients/getClients";
+      let url = `${BACKEND_URL}/clients/getClients`;
 
       if (client_id) {
         url += `?client_id=${client_id}`;
@@ -26,7 +28,7 @@ const AuthProvider = ({ children }) => {
   const addCustomer = async (data) => {
     try {
       const response = await fetch(
-        `http://192.168.1.128:3000/clients/addClient`,
+        `${BACKEND_URL}/clients/addClient`,
         {
           method: "POST",
           headers: {
@@ -49,7 +51,7 @@ const AuthProvider = ({ children }) => {
   const removeClient = async (id) => {
     try {
       const response = await fetch(
-        `http://192.168.1.128:3000/clients/removeClient/${id}`,
+        `${BACKEND_URL}/clients/removeClient/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -74,7 +76,7 @@ const AuthProvider = ({ children }) => {
   const editClient = async (id, data) => {
     try {
       const response = await fetch(
-        `http://192.168.1.128:3000/clients/editClient/${id}`,
+        `${BACKEND_URL}/clients/editClient/${id}`,
         {
           method: "PUT",
           headers: {
@@ -98,7 +100,7 @@ const AuthProvider = ({ children }) => {
   const addVisit = async (data) => {
     try {
       const response = await fetch(
-        `http://192.168.1.128:3000/notices/addNotice`,
+        `${BACKEND_URL}/notices/addNotice`,
         {
           method: "POST",
           headers: {
@@ -126,7 +128,7 @@ const AuthProvider = ({ children }) => {
     endDate = null
   ) => {
     try {
-      let url = "http://192.168.1.128:3000/notices/getNotices";
+      let url = `${BACKEND_URL}/notices/getNotices`;
       let filtersParams = [];
 
       if (client_id) {
@@ -181,7 +183,7 @@ const AuthProvider = ({ children }) => {
   const editVisit = async (data) => {
     try {
       const response = await fetch(
-        `http://192.168.1.128:3000/notices/editNotice`,
+        `${BACKEND_URL}/notices/editNotice`,
         {
           method: "PUT",
           headers: {
@@ -205,7 +207,7 @@ const AuthProvider = ({ children }) => {
   const removeVisit = async (id) => {
     try {
       const response = await fetch(
-        `http://192.168.1.128:3000/notices/removeNotice/${id}`,
+        `${BACKEND_URL}/notices/removeNotice/${id}`,
         {
           method: "DELETE",
           headers: {
