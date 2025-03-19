@@ -81,7 +81,7 @@ export default function AlertConfirmation({client_id, visit_id =  null , type}) 
             <Trash2Icon />
           </Button>
         ): (
-          <Trash2Icon className="text-red-600"/>
+          <Trash2Icon className="text-red-600 cursor-pointer"/>
         )}
       </AlertDialogTrigger>
       <AlertDialogContent>

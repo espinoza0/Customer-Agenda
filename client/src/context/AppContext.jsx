@@ -59,15 +59,15 @@ const AuthProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        return false
+        return false;
         // throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return true
+      return true;
       // return await response.json();
     } catch (error) {
       console.log(error);
-      return false
+      return false;
     }
   };
 
@@ -176,6 +176,8 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const [selectedState, setSelectedState] = useState(null);
+
   const editVisit = async (data) => {
     try {
       const response = await fetch(
@@ -190,13 +192,13 @@ const AuthProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        return false
+        return false;
       }
 
-      return true
+      return true;
     } catch (error) {
       console.log(error);
-      return false
+      return false;
     }
   };
 
@@ -213,13 +215,13 @@ const AuthProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        return false
+        return false;
       }
 
-      return true
+      return true;
     } catch (error) {
       console.log(error);
-      return false
+      return false;
     }
   };
 
@@ -241,7 +243,9 @@ const AuthProvider = ({ children }) => {
         fetchVisits,
         editClient,
         editVisit,
-        removeVisit
+        removeVisit,
+        selectedState, 
+        setSelectedState
       }}
     >
       {children}

@@ -34,8 +34,10 @@ export default function CustomerHistoryPage() {
     visits,
     fetchVisits,
     fetchCustomers,
+    selectedState, 
+    setSelectedState
   } = useContext(AppContext);
-  const [selectedState, setSelectedState] = useState(null);
+  // const [selectedState, setSelectedState] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {

@@ -48,13 +48,13 @@ const formSchema = z.object({
   address: z.string().min(1, "El lugar es requerido"),
   observations: z
     .string()
-    .min(10, "Las observaciones deben tener al menos 10 caracteres"),
+    .min(5, "Las observaciones deben tener al menos 5 caracteres"),
 });
 
 export default function SetNoticeDrawer({ customer, visit = null }) {
   const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const { addVisit, editVisit, fetchVisits } = useContext(AppContext);
+  const { addVisit, editVisit, fetchVisits, selectedState} = useContext(AppContext);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -94,7 +94,7 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
         form.reset();
         setIsOpen(false)
 
-        await fetchVisits(visit?.client_id || customer?.id)
+        await fetchVisits(visit?.client_id || customer?.id, selectedState)
         return toast({
           variant: "success",
           title: "Éxito",
@@ -138,7 +138,7 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             {visit ? (
-              <Edit className="text-blue-600" />
+              <Edit className="text-blue-600 cursor-pointer" />
             ) : (
               <Button className="rounded-full bg-green-800 w-full">
                 Agendar
