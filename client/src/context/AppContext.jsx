@@ -3,9 +3,8 @@ import { createContext, useState } from "react";
 
 const AppContext = createContext();
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5173"
-// console.log(BACKEND_URL)
-// console.log(BACKEND_URL)
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL 
+// const BACKEND_URL = "http://192.168.1.128:3000" //desarrollo
 
 const AuthProvider = ({ children }) => {
   const [hasAcces, setHasAccess] = useState(false);
@@ -170,7 +169,7 @@ const AuthProvider = ({ children }) => {
         url += `?${filtersParams.join("&")}`;
       }
 
-      console.log(url);
+      // console.log(url);
 
       const response = await fetch(url);
       const data = await response.json();

@@ -27,18 +27,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-
-import '../App.css';
+import "../App.css";
 import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 import AlertConfirmation from "./AlertConfirmation";
-
 
 export default function NoticeCard({ visit, selectedState }) {
   const fileInputRef = useRef(null);
@@ -49,7 +46,19 @@ export default function NoticeCard({ visit, selectedState }) {
 
   const handleFileChange = (event) => {
     // Maneja el evento de cambio del archivo seleccionado
-    console.log("Archivo seleccionado:", event.target.files);
+    const file = event.target.files[0];
+    console.log("Archivo seleccionado:", file);
+
+    const allowedExtensions = /(.jpg|.jpeg|.png|.heic)$/i;
+
+    if (!allowedExtensions.exec(file.name)) {
+      alert("Por favor, selecciona un archivo con extensión .jpg, .jpeg, .png o .heic.");
+      event.target.value = ""; // Limpia el input
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append('image', file)
   };
 
   return (
@@ -83,7 +92,6 @@ export default function NoticeCard({ visit, selectedState }) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-          
               </DropdownMenuContent>
             </DropdownMenu>
           </CardTitle>
@@ -141,14 +149,18 @@ export default function NoticeCard({ visit, selectedState }) {
                 </Swiper>
               </DialogContent>
             </Dialog>
-             
-            <SetNoticeDrawer visit={visit}/>
 
-            <AlertConfirmation client_id={visit?.client_id} visit_id={visit?.id} type={"visit"}/>
+            <SetNoticeDrawer visit={visit} />
+
+            <AlertConfirmation
+              client_id={visit?.client_id}
+              visit_id={visit?.id}
+              type={"visit"}
+            />
 
             <input
               type="file"
-              name=""
+              name="image"
               onChange={handleFileChange}
               id=""
               ref={fileInputRef}
