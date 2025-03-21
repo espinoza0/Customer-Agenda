@@ -3,7 +3,8 @@ import { createContext, useState } from "react";
 
 const AppContext = createContext();
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5173"
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5173"
+// console.log(BACKEND_URL)
 // console.log(BACKEND_URL)
 
 const AuthProvider = ({ children }) => {
