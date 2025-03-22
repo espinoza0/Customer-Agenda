@@ -18,7 +18,7 @@ import {
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -122,6 +122,10 @@ export default function NoticeCard({ visit, selectedState }) {
     }
   };
 
+  useEffect(() => {
+    console.log(photos);
+  }, [photos]);
+
   return (
     <>
       <Card
@@ -208,18 +212,21 @@ export default function NoticeCard({ visit, selectedState }) {
                     modules={[Navigation, Pagination]}
                     className="w-full h-full !text-center"
                   >
-                    {photos?.map((photo) => (
-                      <SwiperSlide key={photo?.id}>
-
-                        <img
-                          // src={`../../../server${photo?.url}`}
-                          src={`${BACKEND_URL}${photo.url}`}
-                          // alt={`Imagen no disponible`}
-                          alt={`../../../server${photo?.url}`}
-                          className="w-full h-full object-cover"
-                        />
+                    {photos.length === 0 ? (
+                      <SwiperSlide>
+                        <p>No hay imagenes disponibles para esta visita.</p>
                       </SwiperSlide>
-                    ))}
+                    ) : (
+                      photos.map((photo) => (
+                        <SwiperSlide key={photo?.id}>
+                          <img
+                            src={`${BACKEND_URL}${photo.url}`}
+                            alt={`Imagen actualmente no disponible`}
+                            className="w-full h-full object-cover"
+                          />
+                        </SwiperSlide>
+                      ))
+                    )}
                   </Swiper>
                 )}
               </DialogContent>
