@@ -2,7 +2,7 @@ const { getDb } = require("../config/database");
 
 exports.getNotices = async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const { client_id, pending, start_date, end_date } = req.query;
 
     let filters = [];
@@ -37,7 +37,7 @@ exports.getNotices = async (req, res) => {
 
 exports.addNotice = async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const { date, observations, address, client_id } = req.body;
 
     // por defecto, se insertara el aviso con pending = 1, se cambiara de forma manual en la app
@@ -62,7 +62,7 @@ exports.addNotice = async (req, res) => {
 
 exports.editNotice = async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
 
     const { date, observations, address, visit_id} = req.body;
 
@@ -83,7 +83,7 @@ exports.editNotice = async (req, res) => {
 };
 
 exports.removeNotice = async (req, res) => {
-  const db = getDb();
+  const db = await getDb();
   const { id } = req.params;
   const parsedId = parseInt(id);
 

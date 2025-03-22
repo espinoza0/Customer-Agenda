@@ -2,7 +2,7 @@ const { getDb } = require("../config/database");
 
 exports.getClients = async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const { client_id } = req.query;
 
     let query =
@@ -22,7 +22,7 @@ exports.getClients = async (req, res) => {
 
 exports.addClient = async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const { name, surname, email, address, phone } = req.body;
 
     const query =
@@ -45,7 +45,7 @@ exports.addClient = async (req, res) => {
 };
 
 exports.removeClient = async (req, res) => {
-  const db = getDb();
+  const db = await getDb();
   const { id } = req.params;
 
   const idModified = parseInt(id);
@@ -86,7 +86,7 @@ exports.removeClient = async (req, res) => {
 
 exports.editClient = async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
 
     const { id } = req.params;
     const parsedId = parseInt(id);

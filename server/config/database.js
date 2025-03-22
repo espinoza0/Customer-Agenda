@@ -1,29 +1,39 @@
 const mysql = require("mysql2/promise");
 const config = require('./config');
 
-let connection;
+let pool;
 
 async function connectToDatabase() {
   try {
-    if (!connection) {
-      connection = await mysql.createConnection(config.database);
-      console.log("Conexión a la base de datos establecida");
+    if (!pool) {
+      pool = mysql.createPool({
+        ...config.database,
+        waitForConnections: true,
+        connectionLimit: 2,
+        queueLimit: 0,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 0
+      });
+      console.log("Pool de conexiones a la base de datos establecido");
     }
-    return connection;
+    return pool;
   } catch (error) {
-    console.error("Error al conectar a la base de datos:", error);
+    console.error("Error al crear el pool de conexiones:", error);
     throw error;
   }
 }
 
-function getDb() {
-  if (!connection) {
-    throw new Error('La conexión a la base de datos no ha sido establecida');
+async function getDb() {
+  if (!pool) {
+    await connectToDatabase();
   }
-  return connection;
+  return pool;
 }
 
+// Inicializar el pool inmediatamente
+// connectToDatabase().catch(console.error);
+
 module.exports = {
-  connectToDatabase,
+  connectToDatabase, 
   getDb
 };
