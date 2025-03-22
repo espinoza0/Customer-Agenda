@@ -18,7 +18,7 @@ import {
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,15 +36,22 @@ import "swiper/css/pagination";
 import "../App.css";
 import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 import AlertConfirmation from "./AlertConfirmation";
+import { toast } from "../hooks/use-toast";
+
+// const BACKEND_URL = "http://localhost:3000"; //desarrollo
+const BACKEND_URL = "http://192.168.1.128:3000"; //desarrollo
 
 export default function NoticeCard({ visit, selectedState }) {
   const fileInputRef = useRef(null);
+  const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleCameraClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     // Maneja el evento de cambio del archivo seleccionado
     const file = event.target.files[0];
     console.log("Archivo seleccionado:", file);
@@ -52,13 +59,67 @@ export default function NoticeCard({ visit, selectedState }) {
     const allowedExtensions = /(.jpg|.jpeg|.png|.heic)$/i;
 
     if (!allowedExtensions.exec(file.name)) {
-      alert("Por favor, selecciona un archivo con extensión .jpg, .jpeg, .png o .heic.");
+      alert(
+        "Por favor, selecciona un archivo con extensión .jpg, .jpeg, .png o .heic."
+      );
       event.target.value = ""; // Limpia el input
       return false;
     }
 
     const formData = new FormData();
-    formData.append('image', file)
+    formData.append("file", file);
+    formData.append("visit_id", visit?.id);
+    formData.append("client_id", visit?.client_id);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/photos/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Archivo subido exitosamente:", result);
+
+        return toast({
+          variant: "success",
+          title: "Éxito",
+          description: "Imagen subida correctamente.",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return toast({
+        variant: "destructive",
+        title: "Advertencia",
+        description: "No se pudo subir la imagen.",
+        duration: 3000,
+      });
+    }
+  };
+
+  const getVisitPhotos = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch(
+        `${BACKEND_URL}/photos/getImages/${visit?.id}`
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      setPhotos(data);
+    } catch (error) {
+      console.error("Error: ", error);
+      setError("Failed to load images");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -116,7 +177,14 @@ export default function NoticeCard({ visit, selectedState }) {
 
           <div className="flex gap-5">
             <Camera onClick={handleCameraClick} className="cursor-pointer" />
-            <Dialog className="">
+            <Dialog
+              className=""
+              onOpenChange={(open) => {
+                if (open) {
+                  getVisitPhotos();
+                }
+              }}
+            >
               <DialogTrigger>
                 <Images className="text-green-600 cursor-pointer" />
               </DialogTrigger>
@@ -126,27 +194,34 @@ export default function NoticeCard({ visit, selectedState }) {
                     Aviso #{visit?.id} Galeria
                   </DialogTitle>
                 </DialogHeader>
+                {isLoading ? (
+                  <div>Loading..</div>
+                ) : error ? (
+                  <div>Error</div>
+                ) : (
+                  <Swiper
+                    spaceBetween={10}
+                    slidesPerView={1}
+                    loop={true}
+                    navigation
+                    pagination={{ clickable: true }}
+                    modules={[Navigation, Pagination]}
+                    className="w-full h-full !text-center"
+                  >
+                    {photos?.map((photo) => (
+                      <SwiperSlide key={photo?.id}>
 
-                {/* <GalleryNotice/> */}
-                <Swiper
-                  spaceBetween={10}
-                  slidesPerView={1}
-                  loop={true}
-                  navigation
-                  pagination={{ clickable: true }}
-                  modules={[Navigation, Pagination]}
-                  className="w-full h-full !text-center"
-                >
-                  {[...Array(3)].map((_, index) => (
-                    <SwiperSlide key={index}>
-                      <img
-                        src="https://sefhor.com/wp-content/uploads/diferencia-entre-encargado-obra-y-jefe-obra.jpg"
-                        alt={`Imagen no disponible`}
-                        className="w-full h-full object-cover"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                        <img
+                          // src={`../../../server${photo?.url}`}
+                          src={`${BACKEND_URL}${photo.url}`}
+                          // alt={`Imagen no disponible`}
+                          alt={`../../../server${photo?.url}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                )}
               </DialogContent>
             </Dialog>
 
