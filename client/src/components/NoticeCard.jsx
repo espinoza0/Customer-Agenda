@@ -1,4 +1,4 @@
-import { Camera, Images, MoreVertical, UserCircle } from "lucide-react";
+import { Images, MoreVertical, UserCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,68 +36,15 @@ import "swiper/css/pagination";
 import "../App.css";
 import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 import AlertConfirmation from "./AlertConfirmation";
-import { toast } from "../hooks/use-toast";
+import UploadImageNotice from "./UploadImageNotice";
 
 // const BACKEND_URL = "http://localhost:3000"; //desarrollo
 const BACKEND_URL = "http://192.168.1.128:3000"; //desarrollo
 
 export default function NoticeCard({ visit, selectedState }) {
-  const fileInputRef = useRef(null);
   const [photos, setPhotos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const handleCameraClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = async (event) => {
-    // Maneja el evento de cambio del archivo seleccionado
-    const file = event.target.files[0];
-    console.log("Archivo seleccionado:", file);
-
-    const allowedExtensions = /(.jpg|.jpeg|.png|.heic)$/i;
-
-    if (!allowedExtensions.exec(file.name)) {
-      alert(
-        "Por favor, selecciona un archivo con extensión .jpg, .jpeg, .png o .heic."
-      );
-      event.target.value = ""; // Limpia el input
-      return false;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("visit_id", visit?.id);
-    formData.append("client_id", visit?.client_id);
-
-    try {
-      const response = await fetch(`${BACKEND_URL}/photos/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Archivo subido exitosamente:", result);
-
-        return toast({
-          variant: "success",
-          title: "Éxito",
-          description: "Imagen subida correctamente.",
-          duration: 3000,
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      return toast({
-        variant: "destructive",
-        title: "Advertencia",
-        description: "No se pudo subir la imagen.",
-        duration: 3000,
-      });
-    }
-  };
 
   const getVisitPhotos = async () => {
     try {
@@ -122,9 +69,10 @@ export default function NoticeCard({ visit, selectedState }) {
     }
   };
 
-  useEffect(() => {
-    console.log(photos);
-  }, [photos]);
+  // useEffect(() => {
+  //   console.log(photos);
+  // }, [photos]);
+
 
   return (
     <>
@@ -180,7 +128,8 @@ export default function NoticeCard({ visit, selectedState }) {
           </span>
 
           <div className="flex gap-5">
-            <Camera onClick={handleCameraClick} className="cursor-pointer" />
+            {/* Modal para subir la imagen */}
+            <UploadImageNotice visit={visit} /> 
             <Dialog
               className=""
               onOpenChange={(open) => {
@@ -190,7 +139,7 @@ export default function NoticeCard({ visit, selectedState }) {
               }}
             >
               <DialogTrigger>
-                <Images className="text-green-600 cursor-pointer" />
+                <Images className="text-green-600 cursor-pointer"  />
               </DialogTrigger>
               <DialogContent className="p-0 max-w-[40rem] overflow-hidden bg-black border-0 text-white min-h-[20rem]">
                 <DialogHeader>
@@ -240,15 +189,7 @@ export default function NoticeCard({ visit, selectedState }) {
               type={"visit"}
             />
 
-            <input
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              id=""
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-            />
+            
           </div>
         </CardFooter>
       </Card>
