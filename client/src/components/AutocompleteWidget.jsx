@@ -12,7 +12,7 @@ const AutocompleteWidget = ({ field }) => {
   const { ref: placesRef } = usePlacesWidget({
     apiKey: import.meta.env.VITE_API_KEY,
     onPlaceSelected: (place) => {
-      field.onChange(place.formatted_address);
+      field.onChange(place?.formatted_address);
     },
     options: {
       types: ["address"],

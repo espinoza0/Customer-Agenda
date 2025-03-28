@@ -49,26 +49,35 @@ exports.removeClient = async (req, res) => {
   const { id } = req.params;
 
   const idModified = parseInt(id);
+
+  let connection;
+
   try {
-    await db.beginTransaction();
+    // Obtener una conexión individual del pool
+    connection = await db.getConnection();
+    await connection.beginTransaction();
 
     // 1. Eliminar las invoices asociadas al cliente
-    await db.query("DELETE FROM invoices WHERE client_id = ?", [idModified]);
+    await connection.query("DELETE FROM invoices WHERE client_id = ?", [idModified]);
 
     // 2. Eliminar los budgets asociados al cliente
-    await db.query("DELETE FROM budget WHERE client_id = ?", [idModified]);
+    await connection.query("DELETE FROM budget WHERE client_id = ?", [idModified]);
 
     // 3. Eliminar las visits asociadas al cliente
-    await db.query("DELETE FROM visits WHERE client_id = ?", [idModified]);
+    await connection.query("DELETE FROM visits WHERE client_id = ?", [idModified]);
+    
+    // 4. Eliminar las visits asociadas al cliente
+    await connection.query("DELETE FROM photos WHERE client_id = ?", [idModified]);
 
-    // 4. Finalmente, eliminar el cliente
-    const result = await db.query("DELETE FROM clients WHERE id = ?", [
+    // 5. Finalmente, eliminar el cliente
+    const [result] = await connection.query("DELETE FROM clients WHERE id = ?", [
       idModified,
     ]);
 
-    await db.commit();
+    await connection.commit();
+    connection.release()
 
-    if (result[0].affectedRows > 0) {
+    if (result.affectedRows > 0) {
       res
         .status(200)
         .json({ message: "Cliente y todos sus datos eliminados exitosamente" });
@@ -76,7 +85,8 @@ exports.removeClient = async (req, res) => {
       res.status(404).json({ error: "Cliente no encontrado" });
     }
   } catch (error) {
-    await db.rollback();
+    await connection.rollback();
+    connection.release(); // Asegúrate de liberar la conexión en caso de error
     console.error("Error al eliminar cliente:", error);
     res
       .status(500)
