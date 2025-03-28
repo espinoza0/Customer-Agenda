@@ -87,15 +87,30 @@ exports.removeNotice = async (req, res) => {
   const { id } = req.params;
   const parsedId = parseInt(id);
 
+  let connection;
   try {
-    const result = await db.query("DELETE FROM visits WHERE id = ?", [parsedId]);
+    connection = await db.getConnection();
 
-    if (result[0].affectedRows > 0) {
+    await connection.beginTransaction();
+
+    // Primero se eliminan las fotos asociadas a la visita
+    await await connection.query("DELETE FROM photos WHERE visit_id = ?", [parsedId]);
+
+    const [result] = await connection.query("DELETE FROM visits WHERE id = ?", [parsedId]);
+    
+
+    await connection.commit();
+    connection.release()
+
+    if (result.affectedRows > 0) {
       res.status(200).json({ message: "Visita eliminada exitosamente" });
     } else {
       res.status(404).json({ error: "Visita no encontrada" });
     }
   } catch (error) {
+    // Si hay un error, revertir la transacción
+    await connection.rollback();
+    connection.release()
     console.error("Error al eliminar la visita: ", error);
     res.status(500).json({ error: "Error al eliminar la visita." });
   }
