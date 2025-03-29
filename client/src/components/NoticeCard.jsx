@@ -169,7 +169,8 @@ export default function NoticeCard({ visit, selectedState }) {
                       photos.map((photo) => (
                         <SwiperSlide key={photo?.id}>
                           <img
-                            src={`${BACKEND_URL}${photo.url}`}
+                            // src={`${BACKEND_URL}${photo.url}`}
+                            src={`${photo.url}`}
                             alt={`Imagen actualmente no disponible`}
                             className="w-full h-full object-cover"
                           />

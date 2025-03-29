@@ -32,6 +32,7 @@ export default function UploadImageNotice({ visit }) {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false)
 
   const fileInputRef = useRef(null);
 
@@ -59,22 +60,57 @@ export default function UploadImageNotice({ visit }) {
     setSelectedFile(file);
   };
 
-  const handleUploadConfirm = async () => {
-    // Maneja el evento de cambio del archivo seleccionado
-    if (!selectedFile || !visit) return;
+  const uploadToCloudinary = async (file) => {
+    if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("visit_id", visit?.id);
-    formData.append("client_id", visit?.client_id);
+    formData.append("file", file);
+    formData.append("upload_preset", "Services"); //  preset de subida
 
     try {
+      const cloud = import.meta.env.VITE_CLOUD_NAME
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloud}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al subir la imagen a Cloudinary");
+      }
+
+      const data = await response.json();
+      // setCloudinaryUrl(data?.secure_url); // URL de la imagen subida a Cloudinary.   
+      return data.secure_url; // URL de la imagen subida
+
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
+  };
+
+
+  const handleUploadConfirm = async () => {
+    setIsLoading(true)
+    try {
+      const url = await uploadToCloudinary(selectedFile); 
+
       const response = await fetch(`${BACKEND_URL}/photos/upload`, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          visit_id: visit?.id,
+          client_id: visit?.client_id,
+          url: url,
+        }),
       });
 
       if (response.ok) {
+        setIsLoading(false)
         const result = await response.json();
         console.log("Archivo subido exitosamente:", result);
 
@@ -93,6 +129,7 @@ export default function UploadImageNotice({ visit }) {
         });
       }
     } catch (error) {
+      setIsLoading(false)
       console.error("Error:", error);
       return toast({
         variant: "destructive",
@@ -103,7 +140,6 @@ export default function UploadImageNotice({ visit }) {
     }
   };
 
-  //   console.log(previewImage)
   const handleRetakePhoto = () => {
     setPreviewImage(null);
     if (fileInputRef.current) {
@@ -125,14 +161,15 @@ export default function UploadImageNotice({ visit }) {
             </DialogHeader>
             <div className="rounded-lg bg-slate-100 p-4">
               <p className="font-semibold text-gray-900">
-                Detalles del servicio:
+                Detalles del servicio: #{visit?.id}
               </p>
               <p className="text-gray-700 mt-2">
                 <span className="font-semibold">Cliente</span>:{" "}
                 {visit?.client_name}
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Fecha</span>: {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
+                <span className="font-semibold">Fecha</span>:{" "}
+                {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
               </p>
               <p className="text-gray-700">
                 <span className="font-semibold">Observaciones</span>:{" "}
@@ -186,7 +223,7 @@ export default function UploadImageNotice({ visit }) {
               <Button
                 onClick={handleUploadConfirm}
                 className="flex-1 disabled:opacity-35"
-                disabled={!selectedFile}
+                disabled={!selectedFile || isLoading}
               >
                 Guardar Imagen
               </Button>
@@ -204,14 +241,15 @@ export default function UploadImageNotice({ visit }) {
             </DrawerHeader>
             <div className="rounded-lg bg-slate-100 p-4">
               <p className="font-semibold text-gray-900">
-                Detalles del servicio:
+                Detalles del servicio: #{visit?.id}
               </p>
               <p className="text-gray-700 mt-2">
                 <span className="font-semibold">Cliente</span>:{" "}
                 {visit?.client_name}
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Fecha</span>: {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
+                <span className="font-semibold">Fecha</span>:{" "}
+                {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
               </p>
               <p className="text-gray-700">
                 <span className="font-semibold">Observaciones</span>:{" "}
@@ -262,7 +300,7 @@ export default function UploadImageNotice({ visit }) {
               <Button
                 onClick={handleUploadConfirm}
                 className="disabled:opacity-35"
-                disabled={!selectedFile}
+                disabled={!selectedFile || isLoading}
               >
                 Guardar Imagen
               </Button>

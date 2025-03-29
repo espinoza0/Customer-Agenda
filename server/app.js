@@ -31,8 +31,7 @@ app.use("/clients", customersRoutes);
 app.use("/notices", noticesRoutes);
 app.use("/photos", photosRoutes)
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 const startServer = async () => { 
