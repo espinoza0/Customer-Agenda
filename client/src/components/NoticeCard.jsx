@@ -148,9 +148,11 @@ export default function NoticeCard({ visit, selectedState }) {
                   </DialogTitle>
                 </DialogHeader>
                 {isLoading ? (
-                  <div>Loading..</div>
+                  <div className="text-center">
+                    Cargando...
+                  </div>
                 ) : error ? (
-                  <div>Error</div>
+                  <div className="text-center">Error</div>
                 ) : (
                   <Swiper
                     spaceBetween={10}
