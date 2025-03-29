@@ -1,4 +1,4 @@
-import { Camera, Images, MoreVertical, UserCircle } from "lucide-react";
+import { Images, MoreVertical, UserCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";
-import { useRef } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,30 +36,43 @@ import "swiper/css/pagination";
 import "../App.css";
 import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 import AlertConfirmation from "./AlertConfirmation";
+import UploadImageNotice from "./UploadImageNotice";
+
+// const BACKEND_URL = "http://localhost:3000"; //desarrollo
+const BACKEND_URL = "http://192.168.1.128:3000"; //desarrollo
 
 export default function NoticeCard({ visit, selectedState }) {
-  const fileInputRef = useRef(null);
+  const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleCameraClick = () => {
-    fileInputRef.current.click();
-  };
+  const getVisitPhotos = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  const handleFileChange = (event) => {
-    // Maneja el evento de cambio del archivo seleccionado
-    const file = event.target.files[0];
-    console.log("Archivo seleccionado:", file);
+      const response = await fetch(
+        `${BACKEND_URL}/photos/getImages/${visit?.id}`
+      );
+      const data = await response.json();
 
-    const allowedExtensions = /(.jpg|.jpeg|.png|.heic)$/i;
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-    if (!allowedExtensions.exec(file.name)) {
-      alert("Por favor, selecciona un archivo con extensión .jpg, .jpeg, .png o .heic.");
-      event.target.value = ""; // Limpia el input
-      return false;
+      setPhotos(data);
+    } catch (error) {
+      console.error("Error: ", error);
+      setError("Failed to load images");
+    } finally {
+      setIsLoading(false);
     }
-
-    const formData = new FormData();
-    formData.append('image', file)
   };
+
+  // useEffect(() => {
+  //   console.log(photos);
+  // }, [photos]);
+
 
   return (
     <>
@@ -115,10 +128,18 @@ export default function NoticeCard({ visit, selectedState }) {
           </span>
 
           <div className="flex gap-5">
-            <Camera onClick={handleCameraClick} className="cursor-pointer" />
-            <Dialog className="">
+            {/* Modal para subir la imagen */}
+            <UploadImageNotice visit={visit} /> 
+            <Dialog
+              className=""
+              onOpenChange={(open) => {
+                if (open) {
+                  getVisitPhotos();
+                }
+              }}
+            >
               <DialogTrigger>
-                <Images className="text-green-600 cursor-pointer" />
+                <Images className="text-green-600 cursor-pointer"  />
               </DialogTrigger>
               <DialogContent className="p-0 max-w-[40rem] overflow-hidden bg-black border-0 text-white min-h-[20rem]">
                 <DialogHeader>
@@ -126,27 +147,38 @@ export default function NoticeCard({ visit, selectedState }) {
                     Aviso #{visit?.id} Galeria
                   </DialogTitle>
                 </DialogHeader>
-
-                {/* <GalleryNotice/> */}
-                <Swiper
-                  spaceBetween={10}
-                  slidesPerView={1}
-                  loop={true}
-                  navigation
-                  pagination={{ clickable: true }}
-                  modules={[Navigation, Pagination]}
-                  className="w-full h-full !text-center"
-                >
-                  {[...Array(3)].map((_, index) => (
-                    <SwiperSlide key={index}>
-                      <img
-                        src="https://sefhor.com/wp-content/uploads/diferencia-entre-encargado-obra-y-jefe-obra.jpg"
-                        alt={`Imagen no disponible`}
-                        className="w-full h-full object-cover"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                {isLoading ? (
+                  <div>Loading..</div>
+                ) : error ? (
+                  <div>Error</div>
+                ) : (
+                  <Swiper
+                    spaceBetween={10}
+                    slidesPerView={1}
+                    loop={true}
+                    navigation
+                    pagination={{ clickable: true }}
+                    modules={[Navigation, Pagination]}
+                    className="w-full h-full !text-center"
+                  >
+                    {photos.length === 0 ? (
+                      <SwiperSlide>
+                        <p>No hay imagenes disponibles para esta visita.</p>
+                      </SwiperSlide>
+                    ) : (
+                      photos.map((photo) => (
+                        <SwiperSlide key={photo?.id}>
+                          <img
+                            // src={`${BACKEND_URL}${photo.url}`}
+                            src={`${photo.url}`}
+                            alt={`Imagen actualmente no disponible`}
+                            className="w-full h-full object-cover"
+                          />
+                        </SwiperSlide>
+                      ))
+                    )}
+                  </Swiper>
+                )}
               </DialogContent>
             </Dialog>
 
@@ -158,15 +190,7 @@ export default function NoticeCard({ visit, selectedState }) {
               type={"visit"}
             />
 
-            <input
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              id=""
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-            />
+            
           </div>
         </CardFooter>
       </Card>
