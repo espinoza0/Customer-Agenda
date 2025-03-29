@@ -63,7 +63,6 @@ const { getDb } = require("../config/database");
 router.post("/upload", async (req, res) => {
   try {
     const { visit_id, client_id , url} = req.body;
-    console.log(visit_id, client_id, url);
 
     if (!visit_id || !client_id || !url) {
       return res.status(400).json({ error: "Faltan datos necesarios." });

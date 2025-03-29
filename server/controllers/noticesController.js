@@ -27,7 +27,6 @@ exports.getNotices = async (req, res) => {
       `SELECT visits.*, CONCAT(clients.name, ' ', clients.surname) AS client_name FROM visits JOIN clients ON visits.client_id = clients.id ${optParams} ORDER BY visits.date DESC`
     );
 
-    // console.log("visitas: ", result);
     res.json(result);
   } catch (error) {
     console.error("Error al obtener las visitas:", error);
