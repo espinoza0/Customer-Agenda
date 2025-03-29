@@ -38,8 +38,8 @@ import SetNoticeDrawer from "./customercard/SetNoticeDrawer";
 import AlertConfirmation from "./AlertConfirmation";
 import UploadImageNotice from "./UploadImageNotice";
 
-// const BACKEND_URL = "http://localhost:3000"; //desarrollo
-const BACKEND_URL = "http://192.168.1.128:3000"; //desarrollo
+// const BACKEND_URL = "http://192.168.1.128:3000"; //desarrollo
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
 
 export default function NoticeCard({ visit, selectedState }) {
   const [photos, setPhotos] = useState([]);

@@ -24,7 +24,7 @@ import { DrawerFooter } from "./ui/drawer";
 import { format } from "date-fns";
 
 // const BACKEND_URL = "http://localhost:3000"; //desarrollo
-const BACKEND_URL = "http://192.168.1.128:3000"; //desarrollo
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; //desarrollo
 
 export default function UploadImageNotice({ visit }) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
