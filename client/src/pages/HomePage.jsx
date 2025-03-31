@@ -217,7 +217,22 @@ export default function HomePage() {
         </Dialog>
       ) : (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
-          <DrawerContent>
+          <DrawerContent
+            className="sm:max-w-[425px]"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={(e) => {
+              const hasPacItem = e.composedPath().some((el) => {
+                if ("classList" in el) {
+                  return Array.from(el.classList).includes("pac-item");
+                }
+                return false;
+              });
+
+              if (hasPacItem) {
+                e.preventDefault();
+              }
+            }}
+          >
             <DrawerHeader>
               <DrawerTitle>Introduce los datos del Cliente</DrawerTitle>
             </DrawerHeader>

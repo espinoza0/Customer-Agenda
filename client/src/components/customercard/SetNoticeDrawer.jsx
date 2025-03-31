@@ -54,7 +54,8 @@ const formSchema = z.object({
 export default function SetNoticeDrawer({ customer, visit = null }) {
   const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const { addVisit, editVisit, fetchVisits, selectedState} = useContext(AppContext);
+  const { addVisit, editVisit, fetchVisits, selectedState } =
+    useContext(AppContext);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -78,13 +79,11 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
       };
 
       let success;
-      
-      
+
       if (visit) {
         // Editar
         console.log(formattedData);
         success = await editVisit(formattedData);
-        
       } else {
         // Crear Aviso
         success = await addVisit(formattedData);
@@ -92,9 +91,9 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
 
       if (success) {
         form.reset();
-        setIsOpen(false)
+        setIsOpen(false);
 
-        await fetchVisits(visit?.client_id || customer?.id, selectedState)
+        await fetchVisits(visit?.client_id || customer?.id, selectedState);
         return toast({
           variant: "success",
           title: "Éxito",
@@ -232,10 +231,7 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                >
+                <Button type="submit" className="w-full">
                   {visit ? "Actualizar Visita" : "Crear Visita"}
                 </Button>
               </form>
@@ -254,7 +250,22 @@ export default function SetNoticeDrawer({ customer, visit = null }) {
               </Button>
             )}
           </DrawerTrigger>
-          <DrawerContent className="h-[85vh] flex flex-col">
+          <DrawerContent
+            className="h-[85vh] flex flex-col sm:max-w-[425px]"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={(e) => {
+              const hasPacItem = e.composedPath().some((el) => {
+                if ("classList" in el) {
+                  return Array.from(el.classList).includes("pac-item");
+                }
+                return false;
+              });
+
+              if (hasPacItem) {
+                e.preventDefault();
+              }
+            }}
+          >
             <DrawerHeader className="flex-shrink-0">
               <DrawerTitle>
                 {visit ? "Editar Visita" : "Agendar Visita"} -{" "}
