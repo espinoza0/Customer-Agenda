@@ -64,9 +64,6 @@
     @apply bg-slate-100;
   }
 }
-/* body{
-  background-color: ;
-} */
 section{
   max-width: 90rem;
   margin: 0 auto;
