@@ -1,4 +1,4 @@
-import { Images, MoreVertical, UserCircle } from "lucide-react";
+import { Calendar, Images, Map, MapPin, MoreVertical, UserCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -73,7 +73,6 @@ export default function NoticeCard({ visit, selectedState }) {
   //   console.log(photos);
   // }, [photos]);
 
-
   return (
     <>
       <Card
@@ -110,7 +109,12 @@ export default function NoticeCard({ visit, selectedState }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 flex items-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap">
+            <Map size={17} /> {visit?.address}
+          </span>
+
+          <p className="text-sm text-gray-500 flex items-center gap-1 ">
+            <Calendar size={17}/>
             {format(visit?.date, "dd/MM/yyyy HH:mm:ss")}
           </p>
           <p className="mt-2">{visit.observations}</p>
@@ -129,7 +133,7 @@ export default function NoticeCard({ visit, selectedState }) {
 
           <div className="flex gap-5">
             {/* Modal para subir la imagen */}
-            <UploadImageNotice visit={visit} /> 
+            <UploadImageNotice visit={visit} />
             <Dialog
               className=""
               onOpenChange={(open) => {
@@ -139,7 +143,7 @@ export default function NoticeCard({ visit, selectedState }) {
               }}
             >
               <DialogTrigger>
-                <Images className="text-green-600 cursor-pointer"  />
+                <Images className="text-green-600 cursor-pointer" />
               </DialogTrigger>
               <DialogContent className="p-0 max-w-[40rem] overflow-hidden bg-black border-0 text-white min-h-[20rem]">
                 <DialogHeader>
@@ -170,7 +174,7 @@ export default function NoticeCard({ visit, selectedState }) {
                         <SwiperSlide key={photo?.id}>
                           <img
                             // src={`${BACKEND_URL}${photo.url}`}
-                            src={`${photo.url}`}
+                            src={`${photo?.url}`}
                             alt={`Imagen actualmente no disponible`}
                             className="w-full h-full object-cover"
                           />
@@ -183,14 +187,13 @@ export default function NoticeCard({ visit, selectedState }) {
             </Dialog>
 
             <SetNoticeDrawer visit={visit} />
-
+              
+            <MapPin className="text-yellow-700"/>
             <AlertConfirmation
               client_id={visit?.client_id}
               visit_id={visit?.id}
               type={"visit"}
             />
-
-            
           </div>
         </CardFooter>
       </Card>
